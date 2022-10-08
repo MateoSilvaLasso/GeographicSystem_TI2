@@ -2,7 +2,11 @@ package model;
 
 import java.util.ArrayList;
 
+import Exception.IncorrectFormatExcepcion;
+
 public class Country {
+
+
     private String id;
     private String name;
     private double population;
@@ -10,11 +14,20 @@ public class Country {
 
     private ArrayList<City> cities;
 
-    public Country(String id, String name, double population, String countryCode) {
-        this.id = id;
-        this.name = name;
+    public Country(String id, String name, double population, String countryCode) throws IncorrectFormatExcepcion {
+        if(id.charAt(0)!=34 && id.charAt(id.length()-1)!=34)
+            throw new IncorrectFormatExcepcion(id);
+        else
+            this.id = id;
+        if(name.charAt(0)!=34 && name.charAt(name.length()-1)!=34)
+            throw new IncorrectFormatExcepcion(name);
+        else
+            this.name = name;
         this.population = population;
-        this.countryCode = countryCode;
+        if(countryCode.charAt(0)!=34 && countryCode.charAt(countryCode.length()-1)!=34 && countryCode.charAt(1)!=43)
+            throw new IncorrectFormatExcepcion(countryCode);
+        else
+            this.countryCode = countryCode;
         this.cities= new ArrayList<>();
     }
 

@@ -1,15 +1,28 @@
 package model;
 
+import Exception.IncorrectFormatExcepcion;
+
 public class City {
     private String id;
     private String name;
     private String countryId;
-    private int population;
+    private double population;
 
-    public City(String id, String name, String countryId, int population) {
-        this.id = id;
-        this.name = name;
-        this.countryId = countryId;
+    public City(String id, String name, String countryId, double population) throws IncorrectFormatExcepcion{
+        if(id.charAt(0)!= 34 && id.charAt(id.length()-1)!=34)
+            throw new IncorrectFormatExcepcion(id);
+        else
+            this.id = id;
+
+        if(name.charAt(0)!=34 && name.charAt(name.length()-1)!=34)
+            throw new IncorrectFormatExcepcion(name);
+        else
+            this.name = name;
+        if(countryId.charAt(0)!=34 && countryId.charAt(countryId.length()-1)!=34)
+            throw new IncorrectFormatExcepcion(countryId);
+        else
+            this.countryId = countryId;
+
         this.population = population;
     }
 
@@ -37,11 +50,11 @@ public class City {
         this.countryId = countryId;
     }
 
-    public int getPopulation() {
+    public double getPopulation() {
         return population;
     }
 
-    public void setPopulation(int population) {
+    public void setPopulation(double population) {
         this.population = population;
     }
 }
