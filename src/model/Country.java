@@ -15,23 +15,23 @@ public class Country {
     private ArrayList<City> cities;
 
     public Country(String id, String name, double population, String countryCode) throws IncorrectFormatExcepcion {
-        if(id.charAt(0)!=34 && id.charAt(id.length()-1)!=34)
+        if(id.charAt(0)!=39 && id.charAt(id.length()-1)!=39)
             throw new IncorrectFormatExcepcion(id);
         else
             this.id = id;
-        if(name.charAt(0)!=34 && name.charAt(name.length()-1)!=34)
+        if(name.charAt(0)!=39 && name.charAt(name.length()-1)!=39)
             throw new IncorrectFormatExcepcion(name);
         else
             this.name = name;
         this.population = population;
-        if(countryCode.charAt(0)!=34 && countryCode.charAt(countryCode.length()-1)!=34 && countryCode.charAt(1)!=43)
+        if(countryCode.charAt(0)!=39 && countryCode.charAt(countryCode.length()-1)!=39 && countryCode.charAt(1)!=43)
             throw new IncorrectFormatExcepcion(countryCode);
         else
             this.countryCode = countryCode;
         this.cities= new ArrayList<>();
     }
 
-    public boolean addCity(City city){
+    public boolean addCity(City city) throws IncorrectFormatExcepcion{
         return cities.add(city);
     }
 
