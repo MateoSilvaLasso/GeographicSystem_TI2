@@ -9,16 +9,16 @@ public class City {
     private double population;
 
     public City(String id, String name, String countryId, double population) throws IncorrectFormatExcepcion{
-        if(id.charAt(0)!= 34 && id.charAt(id.length()-1)!=34)
+        if(id.charAt(0)!= 39 && id.charAt(id.length()-1)!=39)
             throw new IncorrectFormatExcepcion(id);
         else
             this.id = id;
 
-        if(name.charAt(0)!=34 && name.charAt(name.length()-1)!=34)
+        if(name.charAt(0)!=39 && name.charAt(name.length()-1)!=39)
             throw new IncorrectFormatExcepcion(name);
         else
             this.name = name;
-        if(countryId.charAt(0)!=34 && countryId.charAt(countryId.length()-1)!=34)
+        if(countryId.charAt(0)!=39 && countryId.charAt(countryId.length()-1)!=39)
             throw new IncorrectFormatExcepcion(countryId);
         else
             this.countryId = countryId;

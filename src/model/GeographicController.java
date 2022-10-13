@@ -22,7 +22,7 @@ public class GeographicController {
         this.serializable.add(s);
     }
 
-    public void comprobateComand(String s) throws InexistentComandException{
+    public void comprobateInsertComand(String s) throws InexistentComandException{
         String a="";
         for(int i=0; i<18; i++){
             a+=s.charAt(i);
@@ -48,7 +48,7 @@ public class GeographicController {
             format=s.split("cities");
             String w= format[1];
             w= w.replace("(","");
-            w=w.replace(")","");
+            w=w.replace(") ","");
             String[] x=w.split(",");
             if(!x[0].equals("id") || !x[1].equals("name") || !x[2].equals("countryID") || !x[3].equals("population")){
                 throw new InexistentComandException(s);
@@ -60,8 +60,13 @@ public class GeographicController {
             w=w.replace(")","");
 
             String[] x=w.split(",");
+
             for(int i=0; i< x.length; i++) {
-                if (!x[i].equals(" id") && !x[i].equals(" name") && !x[i].equals(" population") && !x[i].equals(" countryCode")){
+                String c= x[i];
+                if (c.equals("id") || c.equals("name")  || c.equals("population")  || c.equals("countryCode ")){
+
+                }else{
+
                     throw new InexistentComandException(s);
                 }
 
@@ -89,6 +94,13 @@ public class GeographicController {
             throw new NoCountryIDException(s);
         }
 
+    }
+
+    public void comprobateSelectComand(String s)throws InexistentComandException{
+        String []arr= s.split("=");
+        if(!arr[0].equals("SELECT * FROM cities WHERE name")){
+            throw new InexistentComandException(s);
+        }
     }
 
     public void addCity(String id, String name, String CountryCode, double population) throws IncorrectFormatExcepcion{
