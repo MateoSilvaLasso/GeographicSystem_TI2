@@ -96,10 +96,23 @@ public class GeographicController {
 
     }
 
-    public void comprobateSelectComand(String s)throws InexistentComandException{
-        String []arr= s.split("=");
-        if(!arr[0].equals("SELECT * FROM cities WHERE name")){
-            throw new InexistentComandException(s);
+    public void comprobateSelectComand(String s, int option)throws InexistentComandException{
+        String[] arr;
+        if(option==1) {
+             arr = s.split("=");
+            if (!arr[0].equals("SELECT*FROM cities WHERE name")) {
+                throw new InexistentComandException(s);
+            }
+        }else if(option==2){
+            arr= s.split(">");
+            if(!arr[0].equals("SELECT*FROM countries WHERE population ")){
+                throw new InexistentComandException(s);
+            }
+        }else if(option==3){
+            arr= s.split("<");
+            if(!arr[0].equals("SELECT*FROM countries WHERE population ")){
+                throw new InexistentComandException(s);
+            }
         }
     }
 
@@ -115,6 +128,39 @@ public class GeographicController {
 
 
 
+    }
+
+    public boolean searchCountry(String s){
+        boolean flag= false;
+
+        for(int i=0; i<countries.size(); i++){
+            if(countries.get(i).getName().equals(s)){
+                flag= true;
+            }
+        }
+
+        return flag;
+    }
+
+    public ArrayList<String> searchBigPopulation(double p){
+        ArrayList<String> pop= new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            if(countries.get(i).getPopulation()>p){
+                pop.add(countries.get(i).getName());
+            }
+        }
+
+
+        return pop;
+    }
+
+    public ArrayList<String> searchMinPopulation(double p){
+        ArrayList<String> pop= new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            pop.add(countries.get(i).getName());
+        }
+
+        return pop;
     }
 
     public ArrayList<String> getCountries(){

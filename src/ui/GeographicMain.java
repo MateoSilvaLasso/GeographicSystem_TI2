@@ -2,6 +2,7 @@ package ui;
 
 import model.GeographicController;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import Exception.*;
@@ -110,11 +111,50 @@ public class GeographicMain {
     }
 
     public void selectFrom(int option){
+        String comand="";
         try {
             if (option==1) {
                 System.out.println("Ingrese la información en el siguiente formato\n"+ "SELECT*FROM cities WHERE name = 'Value'");
-                String comand= read.nextLine();
-                map.comprobateSelectComand(comand);
+                comand= read.nextLine();
+                map.comprobateSelectComand(comand,option);
+                String[] country= comand.split("=");
+                if(map.searchCountry(country[1])){
+                    System.out.println("El pais no existe");
+                }else{
+                    System.out.println("El pais si existe");
+                }
+            }else if(option==2){
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE population > 100");
+                comand= read.nextLine();
+                map.comprobateSelectComand(comand,option);
+                String []Population= comand.split(">");
+                String w= Population[1];
+                w= w.replace(" ","");
+                double pop= Double.parseDouble(w);
+                ArrayList<String> arr= map.searchBigPopulation(pop);
+                if(arr.isEmpty()){
+                    System.out.println("No existe algun pais con una poblacion mayor que 100 millones");
+                }else{
+                    for(int i=0; i<arr.size(); i++){
+                        System.out.println(arr.get(i));
+                    }
+                }
+            }else if(option==3){
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE population < 30");
+                comand= read.nextLine();
+                map.comprobateSelectComand(comand,option);
+                String []Population= comand.split("<");
+                String w= Population[1];
+                w= w.replace(" ","");
+                double minPop= Double.parseDouble(w);
+                ArrayList<String> arr= map.searchMinPopulation(minPop);
+                if(arr.isEmpty()){
+                    System.out.println("No existe algun pais con una poblacion menor que 30 millones");
+                }else{
+                    for(int i=0; i<arr.size(); i++){
+                        System.out.println(arr.get(i));
+                    }
+                }
             }
         }catch (InexistentComandException ex){
             ex.printStackTrace();
