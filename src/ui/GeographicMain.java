@@ -30,31 +30,41 @@ public class GeographicMain {
         System.out.println("************************************\n"+"Welcome to the best Geographic app\n"+"***********************************");
         System.out.println("1: INSERT INTO\n"+
                            "2: SELECT*FROM\n"+
-                           "3: ");
+                           "3: IMPORT FROM .SQL FILE");
 
-        int option= read.nextInt();
+        int option= Integer.parseInt(read.nextLine());
 
         return option;
     }
 
     public void executeMenu(int option){
         int option1;
-        switch (option){
+        String ans;
+        switch (option) {
             case 1:
-                System.out.println("ingrese 1: añadir country\n"+
-                                   "ingrese 2: añadir city");
-                option1=read.nextInt();
+                System.out.println("ingrese 1: añadir country\n" +
+                        "ingrese 2: añadir city");
+                option1 = read.nextInt();
                 insertInto(option1);
+                map.autoSave();
                 break;
             case 2:
-                System.out.println("ingrese 1: buscar country por name\n"+
-                                   "ingrese 2: buscar countries con poblacion mayor que 100\n" +
-                                   "ingrese 3: buscar countries con poblacion menor que 30\n"+
-                                   "ingrese 4: buscar todos los countries");
-                option1= read.nextInt();
+                System.out.println("ingrese 1: buscar country por name\n" +
+                        "ingrese 2: buscar countries con poblacion mayor que 100\n" +
+                        "ingrese 3: buscar countries con poblacion menor que 30\n" +
+                        "ingrese 4: buscar todos los countries");
+                option1 = Integer.parseInt(read.nextLine());
                 selectFrom(option1);
 
+                break;
 
+            case 3:
+                System.out.println("Please type the name of the .txt file (not incuding the \".txt\"");
+
+                ans = read.nextLine();
+
+                map.importSQL(ans,option);
+                map.autoSave();
         }
     }
 
@@ -63,11 +73,11 @@ public class GeographicMain {
             if (option == 1) {
 
                 System.out.println("Ingrese la informacion en el siguiente formato:\n" +
-                        "INSERT INTO countries(id,name,population,countryCode) VALUES ('value', 'value', value, 'value')");
+                        "INSERT INTO countries(id,name,population,countryCode) VALUES ('value','value',value,'value')");
                 read.nextLine();
                 String country = read.nextLine();
                 String[] a = country.split("VALUES");
-                map.comprobateInsertComand(a[0]);
+                map.comprobateInsertComand(country);
                 String w= a[1];
                 w=w.replace(" (","");
                 w=w.replace(")","");
@@ -81,7 +91,7 @@ public class GeographicMain {
 
             } else {
                 System.out.println("Ingrese la informacion en el siguiente formato:\n" +
-                        "INSERT INTO cities(id, name, population, countryCode) VALUES ('value', 'value', value, 'value')");
+                        "INSERT INTO cities(id,name,population,countryCode) VALUES ('value','value',value,'value')");
                 read.nextLine();
                 String city = read.nextLine();
                 String[] a = city.split("VALUES");
