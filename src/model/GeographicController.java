@@ -106,7 +106,7 @@ public class GeographicController {
         String[] arr;
         if (option == 1) {
             arr = s.split("=");
-            if (!arr[0].equals("SELECT*FROM cities WHERE name")) {
+            if (!arr[0].equals("SELECT*FROM cities WHERE name ")) {
                 throw new InexistentComandException(s);
             }
         } else if (option == 2) {
@@ -117,6 +117,11 @@ public class GeographicController {
         } else if (option == 3) {
             arr = s.split("<");
             if (!arr[0].equals("SELECT*FROM countries WHERE population ")) {
+                throw new InexistentComandException(s);
+            }
+        }else{
+            arr= s.split("WHERE");
+            if(!arr[0].equals("SELECT*FROM countries ")){
                 throw new InexistentComandException(s);
             }
         }
@@ -162,7 +167,8 @@ public class GeographicController {
     public ArrayList<String> searchMinPopulation(double p) {
         ArrayList<String> pop = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
-            pop.add(countries.get(i).getName());
+            if(countries.get(i).getPopulation()<=p)
+                pop.add(countries.get(i).getName());
         }
 
         return pop;
@@ -194,7 +200,37 @@ public class GeographicController {
                 while ((line = reader.readLine()) != null) {
                     //COMPROBAMOS QUE EL ARCHIVO TENGA CONTENIDO EN LA LINEA Y QUE ESE CONTENIDO TENGA UNA INSTRUCCION VALIDA
                         comprobateInsertComand(line);
-                        serializable.add(line);
+
+                        String [] separable= line.split("\\(");
+                        if(separable[0].equals("INSERT INTO countries")){
+                            String [] comand= line.split("VALUES");
+                            String values= comand[1];
+                            values= values.replace(" (", "");
+                            values= values.replace(")","");
+                            String[] atributes= values.split(",");
+                            String id=atributes[0];
+                            String name= atributes[1];
+                            double population= Double.parseDouble(atributes[2]);
+                            String code= atributes[3];
+                            addCountry(id,name,population,code);
+
+                        }else{
+                            String [] comand= line.split("VALUES");
+                            String values= comand[1];
+                            values= values.replace(" (", "");
+                            values= values.replace(")","");
+                            String[] atributes= values.split(",");
+                            comprobateIdCountry(atributes[2]);
+                            String id= atributes[0];
+                            String name= atributes[1];
+                            String code= atributes[2];
+                            double population= Double.parseDouble(atributes[3]);
+                            addCity(id,name,code,population);
+
+                        }
+
+                    serializable.add(line);
+
 
                 }
                 fis.close();

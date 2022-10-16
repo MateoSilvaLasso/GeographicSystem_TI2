@@ -100,7 +100,7 @@ public class GeographicMain {
                 w=w.replace(" (","");
                 w=w.replace(")","");
                 String []comprobate= w.split(",");
-                System.out.println(comprobate[0].hashCode()+" "+"'e4aa04f6-3dd0-11ed-b878-0242ac120002'".hashCode());
+                //System.out.println(comprobate[0].hashCode()+" "+"'e4aa04f6-3dd0-11ed-b878-0242ac120002'".hashCode());
                 map.comprobateIdCountry(comprobate[2]);
                 String id= comprobate[0];
                 String name= comprobate[1];
@@ -128,10 +128,12 @@ public class GeographicMain {
                 comand= read.nextLine();
                 map.comprobateSelectComand(comand,option);
                 String[] country= comand.split("=");
-                if(map.searchCountry(country[1])){
-                    System.out.println("El pais no existe");
-                }else{
+                String t= country[1];
+                t= t.replace(" ","");
+                if(map.searchCountry(t)){
                     System.out.println("El pais si existe");
+                }else{
+                    System.out.println("El pais no existe");
                 }
             }else if(option==2){
                 System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE population > 100");
@@ -160,6 +162,18 @@ public class GeographicMain {
                 ArrayList<String> arr= map.searchMinPopulation(minPop);
                 if(arr.isEmpty()){
                     System.out.println("No existe algun pais con una poblacion menor que 30 millones");
+                }else{
+                    for(int i=0; i<arr.size(); i++){
+                        System.out.println(arr.get(i));
+                    }
+                }
+            }else{
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE");
+                comand= read.nextLine();
+                map.comprobateSelectComand(comand,option);
+                ArrayList<String> arr= map.getCountries();
+                if(arr.isEmpty()){
+                    System.out.println("No existe algun pais");
                 }else{
                     for(int i=0; i<arr.size(); i++){
                         System.out.println(arr.get(i));
