@@ -2,7 +2,7 @@ package model;
 
 import Exception.IncorrectFormatExcepcion;
 
-public class City {
+public class City implements Comparable<City> {
     private String id;
     private String name;
     private String countryId;
@@ -56,5 +56,10 @@ public class City {
 
     public void setPopulation(double population) {
         this.population = population;
+    }
+
+    @Override
+    public int compareTo(City o){
+        return 0;
     }
 }

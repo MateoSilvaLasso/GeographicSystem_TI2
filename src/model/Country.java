@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import Exception.IncorrectFormatExcepcion;
 
-public class Country {
+public class Country implements Comparable<Country> {
 
 
     private String id;
@@ -65,5 +65,18 @@ public class Country {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    public ArrayList<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(ArrayList<City> cities) {
+        this.cities = cities;
+    }
+
+    @Override
+    public int compareTo(Country o) {
+        return 0;
     }
 }

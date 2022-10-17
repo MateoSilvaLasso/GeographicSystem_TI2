@@ -3,6 +3,7 @@ package model;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.io.*;
+import java.util.Collections;
 
 import Exception.*;
 import com.google.gson.Gson;
@@ -86,6 +87,18 @@ public class GeographicController {
 
     }
 
+    public void comprobateAtribute(String s, int option)throws NoAtributeException {
+        if(option==1){
+            if(!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryCode")){
+                throw new NoAtributeException(s);
+            }
+        }else{
+            if(!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryId")){
+                throw new NoAtributeException(s);
+            }
+        }
+    }
+
     public void comprobateIdCountry(String s) throws NoCountryIDException {
 
         boolean flag = false;
@@ -122,6 +135,21 @@ public class GeographicController {
         }else{
             arr= s.split("WHERE");
             if(!arr[0].equals("SELECT*FROM countries ")){
+                throw new InexistentComandException(s);
+            }
+        }
+    }
+
+    public void comprobateOrderByComand(String s,  int option) throws InexistentComandException{
+        String [] arr;
+        if(option == 1){
+            arr= s.split(" ");
+            if(!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY")){
+                throw new InexistentComandException(s);
+            }
+        }else{
+            arr= s.split(" ");
+            if(!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY")){
                 throw new InexistentComandException(s);
             }
         }
@@ -173,6 +201,100 @@ public class GeographicController {
 
         return pop;
     }
+
+    public ArrayList<String> orderSelection(int option, String comand, double number,String name, String atribute){
+        ArrayList<String> all= new ArrayList<>();
+        if(option==1){
+            ArrayList<Country> arr= new ArrayList<>();
+            String[] comprobate= comand.split(" ");
+            if(comprobate[4].equals("<")){
+                for(int i=0; i<countries.size(); i++){
+                    if(countries.get(i).getPopulation()<number){
+                        arr.add(countries.get(i));
+                    }
+                }
+            }else if(comprobate[4].equals(">")){
+                for(int i=0; i<countries.size(); i++){
+                    if(countries.get(i).getPopulation()>number){
+                        arr.add(countries.get(i));
+                    }
+                }
+            }
+
+            if(atribute.equals("id")){
+                Collections.sort(arr,(a,b)->{
+                    return a.getId().compareTo(b.getId());
+                });
+            }else if(atribute.equals("name")){
+                Collections.sort(arr,(a,b)->{
+                    return a.getName().compareTo(b.getName());
+                });
+            }else if(atribute.equals("population")){
+                Collections.sort(arr,(a,b)->{
+                    if(a.getPopulation()<b.getPopulation()){
+                        return -1;
+                    }else{
+                        return 1;
+                    }
+                });
+
+            }else{
+                Collections.sort(arr,(a,b)->{
+                   return a.getCountryCode().compareTo(b.getCountryCode());
+                });
+            }
+
+            for(int i=0; i<arr.size(); i++){
+                String objetive= arr.get(i).getId()+", "+ arr.get(i).getName()+", "+arr.get(i).getPopulation()+", "+ arr.get(i).getCountryCode();
+                all.add(objetive);
+            }
+
+
+        }else{
+            ArrayList<City> arr= new ArrayList<>();
+            for(int i=0; i<countries.size(); i++){
+                for(int j=0; j<countries.get(i).getCities().size(); j++){
+                    if(countries.get(i).getCities().get(j).getName().equals(name)){
+                        //System.out.println();
+                        arr.add(countries.get(i).getCities().get(j));
+                    }
+                }
+            }
+
+            if(atribute.equals("id")){
+                Collections.sort(arr,(a,b)->{
+                    return a.getId().compareTo(b.getId());
+                });
+            }else if(atribute.equals("name")){
+                Collections.sort(arr,(a,b)->{
+                    return a.getName().compareTo(b.getName());
+                });
+            }else if(atribute.equals("countryId")){
+                Collections.sort(arr, (a,b)->{
+                    return a.getCountryId().compareTo(b.getCountryId());
+                });
+            }else{
+                Collections.sort(arr,(a,b)->{
+                    if(a.getPopulation()<b.getPopulation()){
+                        return -1;
+                    }else{
+                        return 1;
+                    }
+                });
+            }
+
+            for(int i=0; i<arr.size(); i++){
+                String objetive= arr.get(i).getId()+", "+ arr.get(i).getName()+", "+ arr.get(i).getCountryId() +", "+arr.get(i).getPopulation();
+                all.add(objetive);
+            }
+
+        }
+
+
+        return all;
+    }
+
+
 
     public ArrayList<String> getCountries() {
         return this.serializable;

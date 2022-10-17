@@ -27,10 +27,11 @@ public class GeographicMain {
     }
 
     public int menu(){
-        System.out.println("************************************\n"+"Welcome to the best Geographic app\n"+"***********************************");
+        System.out.println("************************************\n"+"Welcome to the best Geographic app\n"+"************************************");
         System.out.println("1: INSERT INTO\n"+
                            "2: SELECT*FROM\n"+
-                           "3: IMPORT FROM .SQL FILE");
+                           "3: IMPORT FROM .SQL FILE\n"+
+                           "4: ORDER BY");
 
         int option= Integer.parseInt(read.nextLine());
 
@@ -65,6 +66,13 @@ public class GeographicMain {
 
                 map.importSQL(ans,option);
                 map.autoSave();
+                break;
+            case 4:
+                System.out.println("ingrese 1: para seleccionar y organizar paises por población y un atributo\n"+
+                                   "ingrese 2: para seleccionar y organizar ciudades por nombre y un atributo");
+                option1= read.nextInt();
+                orderBy(option1);
+                break;
         }
     }
 
@@ -182,6 +190,48 @@ public class GeographicMain {
             }
         }catch (InexistentComandException ex){
             ex.printStackTrace();
+        }
+    }
+
+    public void orderBy(int option){
+        String comand="";
+        try {
+            if (option == 1) {
+                System.out.println("Ingrese la información en el siguiente formato\n" + "SELECT*FROM countries WHERE population > number ORDER BY atribute");
+                read.nextLine();
+                comand = read.nextLine();
+                map.comprobateOrderByComand(comand, option);
+                String[] atribute = comand.split("BY ");
+                map.comprobateAtribute(atribute[1],option);
+                String [] criteria= comand.split(" ");
+                double cr= Double.parseDouble(criteria[5]);
+                ArrayList<String> arr= map.orderSelection(option,comand,cr,"",atribute[1]);
+                for(int i=0; i<arr.size(); i++){
+                    System.out.println(arr.get(i));
+                }
+
+            }else{
+                System.out.println("Ingrese la información en el siguiente formato\n"+"SELECT*FROM cities WHERE name = 'Name' ORDER BY atribute");
+                read.nextLine();
+                comand= read.nextLine();
+                map.comprobateOrderByComand(comand,option);
+                String[] atribute = comand.split("BY ");
+                map.comprobateAtribute(atribute[1],option);
+                String [] criteria= comand.split(" ");
+                String name= criteria[5];
+                ArrayList<String> arr= map.orderSelection(option,comand,0,name,atribute[1]);
+                for(int i=0; i<arr.size(); i++){
+                    System.out.println(arr.get(i));
+                }
+
+            }
+        }catch (InexistentComandException ex){
+            ex.printStackTrace();
+        }catch (NoAtributeException ex){
+            ex.printStackTrace();
+        }catch (NumberFormatException ex){
+            ex.printStackTrace();
+            ex.getMessage();
         }
     }
 }
