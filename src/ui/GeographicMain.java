@@ -248,7 +248,7 @@ public class GeographicMain {
         String comand="";
         try {
             if (option == 1) {
-                System.out.println("Ingrese la información en el siguiente formato\n" + "SELECT*FROM countries WHERE population > number ORDER BY atribute");
+                System.out.println("Ingrese la información en el siguiente formato\n" + "SELECT*FROM countries/cities WHERE population > number ORDER BY atribute");
                 read.nextLine();
                 comand = read.nextLine();
                 map.comprobateOrderByComand(comand, option);
@@ -262,7 +262,7 @@ public class GeographicMain {
                 }
 
             }else{
-                System.out.println("Ingrese la información en el siguiente formato\n"+"SELECT*FROM cities WHERE name = 'Name' ORDER BY atribute");
+                System.out.println("Ingrese la información en el siguiente formato\n"+"SELECT*FROM cities/countries WHERE name = 'Name' ORDER BY atribute");
                 read.nextLine();
                 comand= read.nextLine();
                 map.comprobateOrderByComand(comand,option);

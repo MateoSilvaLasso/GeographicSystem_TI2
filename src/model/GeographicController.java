@@ -144,12 +144,13 @@ public class GeographicController {
         String [] arr;
         if(option == 1){
             arr= s.split(" ");
-            if(!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY")){
+            if((!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY")) && (!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY"))){
                 throw new InexistentComandException(s);
             }
+
         }else{
             arr= s.split(" ");
-            if(!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY")){
+            if((!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY")) && (!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY"))){
                 throw new InexistentComandException(s);
             }
         }
@@ -246,86 +247,181 @@ public class GeographicController {
         ArrayList<String> all= new ArrayList<>();
         if(option==1){
             ArrayList<Country> arr= new ArrayList<>();
+            ArrayList<City> ar= new ArrayList<>();
             String[] comprobate= comand.split(" ");
-            if(comprobate[4].equals("<")){
-                for(int i=0; i<countries.size(); i++){
-                    if(countries.get(i).getPopulation()<number){
-                        arr.add(countries.get(i));
+            if(comprobate[1].equals("countries")) {
+                if (comprobate[4].equals("<")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getPopulation() < number) {
+                            arr.add(countries.get(i));
+                        }
+                    }
+                } else if (comprobate[4].equals(">")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getPopulation() > number) {
+                            arr.add(countries.get(i));
+                        }
                     }
                 }
-            }else if(comprobate[4].equals(">")){
-                for(int i=0; i<countries.size(); i++){
-                    if(countries.get(i).getPopulation()>number){
-                        arr.add(countries.get(i));
-                    }
+
+                if (atribute.equals("id")) {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getId().compareTo(b.getId());
+                    });
+                } else if (atribute.equals("name")) {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getName().compareTo(b.getName());
+                    });
+                } else if (atribute.equals("population")) {
+                    Collections.sort(arr, (a, b) -> {
+                        if (a.getPopulation() < b.getPopulation()) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+
+                } else {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getCountryCode().compareTo(b.getCountryCode());
+                    });
                 }
-            }
 
-            if(atribute.equals("id")){
-                Collections.sort(arr,(a,b)->{
-                    return a.getId().compareTo(b.getId());
-                });
-            }else if(atribute.equals("name")){
-                Collections.sort(arr,(a,b)->{
-                    return a.getName().compareTo(b.getName());
-                });
-            }else if(atribute.equals("population")){
-                Collections.sort(arr,(a,b)->{
-                    if(a.getPopulation()<b.getPopulation()){
-                        return -1;
-                    }else{
-                        return 1;
-                    }
-                });
-
+                for (int i = 0; i < arr.size(); i++) {
+                    String objetive = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getPopulation() + ", " + arr.get(i).getCountryCode();
+                    all.add(objetive);
+                }
             }else{
-                Collections.sort(arr,(a,b)->{
-                   return a.getCountryCode().compareTo(b.getCountryCode());
-                });
-            }
+                if(comprobate[4].equals("<")){
+                    for (int i = 0; i < countries.size(); i++) {
+                        //if (countries.get(i).getPopulation() < number) {
+                          //  arr.add(countries.get(i));
+                        //}
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getPopulation() < number){
+                                ar.add(countries.get(i).getCities().get(j));
+                            }
+                        }
+                    }
+                } else if (comprobate[4].equals(">")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if (countries.get(i).getCities().get(j).getPopulation() > number) {
+                                ar.add(countries.get(i).getCities().get(j));
+                            }
+                        }
 
-            for(int i=0; i<arr.size(); i++){
-                String objetive= arr.get(i).getId()+", "+ arr.get(i).getName()+", "+arr.get(i).getPopulation()+", "+ arr.get(i).getCountryCode();
-                all.add(objetive);
-            }
 
+                    }
+                }
+
+                if (atribute.equals("id")) {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getId().compareTo(b.getId());
+                    });
+                } else if (atribute.equals("name")) {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getName().compareTo(b.getName());
+                    });
+                } else if (atribute.equals("population")) {
+                    Collections.sort(ar, (a, b) -> {
+                        if (a.getPopulation() < b.getPopulation()) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+
+                } else {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getCountryId().compareTo(b.getCountryId());
+                    });
+                }
+
+                for (int i = 0; i < ar.size(); i++) {
+                    String objetive = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getPopulation() + ", " + ar.get(i).getCountryId();
+                    all.add(objetive);
+                }
+
+
+
+            }
 
         }else{
             ArrayList<City> arr= new ArrayList<>();
-            for(int i=0; i<countries.size(); i++){
-                for(int j=0; j<countries.get(i).getCities().size(); j++){
-                    if(countries.get(i).getCities().get(j).getName().equals(name)){
-                        //System.out.println();
-                        arr.add(countries.get(i).getCities().get(j));
+            ArrayList<Country> ar= new ArrayList<>();
+            String[] comprobate= comand.split(" ");
+            if(comprobate[1].equals("cities")) {
+                for (int i = 0; i < countries.size(); i++) {
+                    for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                        if (countries.get(i).getCities().get(j).getName().equals(name)) {
+                            //System.out.println();
+                            arr.add(countries.get(i).getCities().get(j));
+                        }
                     }
                 }
-            }
 
-            if(atribute.equals("id")){
-                Collections.sort(arr,(a,b)->{
-                    return a.getId().compareTo(b.getId());
-                });
-            }else if(atribute.equals("name")){
-                Collections.sort(arr,(a,b)->{
-                    return a.getName().compareTo(b.getName());
-                });
-            }else if(atribute.equals("countryId")){
-                Collections.sort(arr, (a,b)->{
-                    return a.getCountryId().compareTo(b.getCountryId());
-                });
+                if (atribute.equals("id")) {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getId().compareTo(b.getId());
+                    });
+                } else if (atribute.equals("name")) {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getName().compareTo(b.getName());
+                    });
+                } else if (atribute.equals("countryId")) {
+                    Collections.sort(arr, (a, b) -> {
+                        return a.getCountryId().compareTo(b.getCountryId());
+                    });
+                } else {
+                    Collections.sort(arr, (a, b) -> {
+                        if (a.getPopulation() < b.getPopulation()) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+                }
+
+                for (int i = 0; i < arr.size(); i++) {
+                    String objetive = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getCountryId() + ", " + arr.get(i).getPopulation();
+                    all.add(objetive);
+                }
             }else{
-                Collections.sort(arr,(a,b)->{
-                    if(a.getPopulation()<b.getPopulation()){
-                        return -1;
-                    }else{
-                        return 1;
+                for(int i=0; i<countries.size(); i++){
+                    if (countries.get(i).getName().equals(name)) {
+                        //System.out.println();
+                        ar.add(countries.get(i));
                     }
-                });
-            }
+                }
 
-            for(int i=0; i<arr.size(); i++){
-                String objetive= arr.get(i).getId()+", "+ arr.get(i).getName()+", "+ arr.get(i).getCountryId() +", "+arr.get(i).getPopulation();
-                all.add(objetive);
+                if (atribute.equals("id")) {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getId().compareTo(b.getId());
+                    });
+                } else if (atribute.equals("name")) {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getName().compareTo(b.getName());
+                    });
+                } else if (atribute.equals("countryId")) {
+                    Collections.sort(ar, (a, b) -> {
+                        return a.getCountryCode().compareTo(b.getCountryCode());
+                    });
+                } else {
+                    Collections.sort(ar, (a, b) -> {
+                        if (a.getPopulation() < b.getPopulation()) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    });
+                }
+
+                for (int i = 0; i < arr.size(); i++) {
+                    String objetive = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
+                    all.add(objetive);
+                }
+
             }
 
         }
