@@ -119,22 +119,22 @@ public class GeographicController {
         String[] arr;
         if (option == 1) {
             arr = s.split("=");
-            if (!arr[0].equals("SELECT*FROM cities WHERE name ")) {
+            if (!arr[0].equals("SELECT*FROM cities WHERE name ") && !arr[0].equals("SELECT*FROM countries WHERE name ")) {
                 throw new InexistentComandException(s);
             }
         } else if (option == 2) {
             arr = s.split(">");
-            if (!arr[0].equals("SELECT*FROM countries WHERE population ")) {
+            if (!arr[0].equals("SELECT*FROM countries WHERE population ") && !arr[0].equals("SELECT*FROM cities WHERE population ")) {
                 throw new InexistentComandException(s);
             }
         } else if (option == 3) {
             arr = s.split("<");
-            if (!arr[0].equals("SELECT*FROM countries WHERE population ")) {
+            if (!arr[0].equals("SELECT*FROM countries WHERE population ") && !arr[0].equals("SELECT*FROM cities WHERE population ")) {
                 throw new InexistentComandException(s);
             }
         }else{
             arr= s.split("WHERE");
-            if(!arr[0].equals("SELECT*FROM countries ")){
+            if(!arr[0].equals("SELECT*FROM countries ") && !arr[0].equals("SELECT*FROM cities ")){
                 throw new InexistentComandException(s);
             }
         }
@@ -180,6 +180,20 @@ public class GeographicController {
         return flag;
     }
 
+    public boolean searchCity(String s){
+        boolean flag= false;
+
+        for(int i=0; i<countries.size(); i++){
+            for(int j=0; j<countries.get(i).getCities().size(); j++){
+                if(countries.get(i).getCities().get(j).getName().equals(s)){
+                    flag=true;
+                }
+            }
+        }
+
+        return flag;
+    }
+
     public ArrayList<String> searchBigPopulation(double p) {
         ArrayList<String> pop = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
@@ -192,11 +206,37 @@ public class GeographicController {
         return pop;
     }
 
+    public ArrayList<String> searchBigCPopulation(double p){
+        ArrayList<String> pop = new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            for(int j=0; j<countries.get(i).getCities().size(); j++){
+                if(countries.get(i).getCities().get(j).getPopulation()>p){
+                    pop.add(countries.get(i).getCities().get(j).getName());
+                }
+            }
+        }
+
+        return pop;
+    }
+
     public ArrayList<String> searchMinPopulation(double p) {
         ArrayList<String> pop = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
             if(countries.get(i).getPopulation()<=p)
                 pop.add(countries.get(i).getName());
+        }
+
+        return pop;
+    }
+
+    public ArrayList<String> searchMinCPopulation(double p){
+        ArrayList<String> pop= new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            for(int j=0; j<countries.get(i).getCities().size(); j++){
+                if(countries.get(i).getCities().get(j).getPopulation()<p){
+                    pop.add(countries.get(i).getCities().get(j).getName());
+                }
+            }
         }
 
         return pop;
@@ -298,6 +338,17 @@ public class GeographicController {
 
     public ArrayList<String> getCountries() {
         return this.serializable;
+    }
+
+    public ArrayList<String> getCities(){
+        ArrayList<String> arr= new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            for(int j=0; j<countries.get(i).getCities().size(); j++){
+                arr.add(countries.get(i).getCities().get(j).getName());
+            }
+        }
+
+        return arr;
     }
 
     //------------------------------------------------------------------------------------------------------------------

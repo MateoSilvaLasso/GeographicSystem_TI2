@@ -51,8 +51,8 @@ public class GeographicMain {
                 break;
             case 2:
                 System.out.println("ingrese 1: buscar country por name\n" +
-                        "ingrese 2: buscar countries con poblacion mayor que 100\n" +
-                        "ingrese 3: buscar countries con poblacion menor que 30\n" +
+                        "ingrese 2: buscar countries con poblacion mayor number\n" +
+                        "ingrese 3: buscar countries con poblacion menor que number\n" +
                         "ingrese 4: buscar todos los countries");
                 option1 = Integer.parseInt(read.nextLine());
                 selectFrom(option1);
@@ -132,59 +132,110 @@ public class GeographicMain {
         String comand="";
         try {
             if (option==1) {
-                System.out.println("Ingrese la información en el siguiente formato\n"+ "SELECT*FROM cities WHERE name = 'Value'");
+                System.out.println("Ingrese la información en el siguiente formato\n"+ "SELECT*FROM cities/countries WHERE name = 'Value'");
                 comand= read.nextLine();
                 map.comprobateSelectComand(comand,option);
                 String[] country= comand.split("=");
-                String t= country[1];
-                t= t.replace(" ","");
-                if(map.searchCountry(t)){
-                    System.out.println("El pais si existe");
+                if(country[0].equals( "SELECT*FROM countries WHERE name ")){
+                    String t= country[1];
+                    t= t.replace(" ","");
+                    if(map.searchCountry(t)){
+                        System.out.println("El pais si existe");
+                    }else{
+                        System.out.println("El pais no existe");
+                    }
                 }else{
-                    System.out.println("El pais no existe");
+                    String t= country[1];
+                    t= t.replace(" ","");
+                    if(map.searchCity(t)){
+                        System.out.println("la ciudad si existe");
+                    }else{
+                        System.out.println("la ciudad no existe");
+                    }
                 }
+
             }else if(option==2){
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE population > 100");
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE population > number");
                 comand= read.nextLine();
                 map.comprobateSelectComand(comand,option);
                 String []Population= comand.split(">");
-                String w= Population[1];
-                w= w.replace(" ","");
-                double pop= Double.parseDouble(w);
-                ArrayList<String> arr= map.searchBigPopulation(pop);
-                if(arr.isEmpty()){
-                    System.out.println("No existe algun pais con una poblacion mayor que 100 millones");
+                if(Population[0].equals("SELECT*FROM countries WHERE population ")){
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double pop = Double.parseDouble(w);
+                    ArrayList<String> arr = map.searchBigPopulation(pop);
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe algun pais con una poblacion mayor que "+pop+" millones");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
                 }else{
-                    for(int i=0; i<arr.size(); i++){
-                        System.out.println(arr.get(i));
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double pop = Double.parseDouble(w);
+                    ArrayList<String> arr = map.searchBigCPopulation(pop);
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe alguna ciudad con una poblacion mayor que "+pop+" millones");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
                     }
                 }
             }else if(option==3){
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE population < 30");
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE population < number");
                 comand= read.nextLine();
                 map.comprobateSelectComand(comand,option);
                 String []Population= comand.split("<");
-                String w= Population[1];
-                w= w.replace(" ","");
-                double minPop= Double.parseDouble(w);
-                ArrayList<String> arr= map.searchMinPopulation(minPop);
-                if(arr.isEmpty()){
-                    System.out.println("No existe algun pais con una poblacion menor que 30 millones");
+                if(Population[0].equals("SELECT*FROM countries WHERE population ")) {
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double minPop = Double.parseDouble(w);
+                    ArrayList<String> arr = map.searchMinPopulation(minPop);
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe algun pais con una poblacion menor que "+minPop+" millones");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
                 }else{
-                    for(int i=0; i<arr.size(); i++){
-                        System.out.println(arr.get(i));
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double minPop = Double.parseDouble(w);
+                    ArrayList<String> arr = map.searchMinCPopulation(minPop);
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe alguna ciudad con una poblacion menor que "+minPop+" millones");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
                     }
                 }
             }else{
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries WHERE");
+                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE");
                 comand= read.nextLine();
                 map.comprobateSelectComand(comand,option);
-                ArrayList<String> arr= map.getCountries();
-                if(arr.isEmpty()){
-                    System.out.println("No existe algun pais");
+                String []Population= comand.split("WHERE");
+                if(Population[0].equals("SELECT*FROM countries ")) {
+                    ArrayList<String> arr = map.getCountries();
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe algun pais");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
                 }else{
-                    for(int i=0; i<arr.size(); i++){
-                        System.out.println(arr.get(i));
+                    ArrayList<String> arr = map.getCities();
+                    if (arr.isEmpty()) {
+                        System.out.println("No existe alguna ciudadffgdx");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
                     }
                 }
             }
