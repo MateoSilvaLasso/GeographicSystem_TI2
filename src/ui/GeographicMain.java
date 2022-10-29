@@ -28,10 +28,9 @@ public class GeographicMain {
 
     public int menu(){
         System.out.println("************************************\n"+"Welcome to the best Geographic app\n"+"************************************");
-        System.out.println("1: INSERT INTO\n"+
-                           "2: SELECT*FROM\n"+
-                           "3: IMPORT FROM .SQL FILE\n"+
-                           "4: ORDER BY");
+        System.out.println("1: Insert Command"+
+                           "2: IMPORT FROM .SQL FILE\n"+
+                           "0: salir");
 
         int option= Integer.parseInt(read.nextLine());
 
@@ -43,49 +42,62 @@ public class GeographicMain {
         String ans;
         switch (option) {
             case 1:
-                System.out.println("ingrese 1: añadir country\n" +
+                /*System.out.println("ingrese 1: añadir country\n" +
                         "ingrese 2: añadir city");
                 option1 = read.nextInt();
                 insertInto(option1);
                 map.autoSave();
-                break;
+                break;*/
+                System.out.println("Type the command");
+                String comand= read.nextLine();
+                if(comand.contains("INSERT") ){
+                    if(comand.contains("countries")){
+                        insertInto(1,comand);
+                    }else{
+                        insertInto(2,comand);
+                    }
+                }else if(comand.contains("SELECT * FROM") && !comand.contains("ORDER")){
+                    if(comand.contains("name")){
+                        selectFrom(1,comand);
+                    }else if(comand.contains(">")){
+                        selectFrom(2,comand);
+                    }else if(comand.contains("<")){
+                        selectFrom(3,comand);
+                    }else if(!comand.contains("WHERE")){
+                        selectFrom(4,comand);
+                    }
+
+                }else if(comand.contains("ORDER")){
+                    if(comand.contains(">")){
+                        orderBy(1,comand);
+                    }else if(comand.contains("name")){
+                        orderBy(1,comand);
+                    }
+                }
             case 2:
-                System.out.println("ingrese 1: buscar country por name\n" +
-                        "ingrese 2: buscar countries con poblacion mayor number\n" +
-                        "ingrese 3: buscar countries con poblacion menor que number\n" +
-                        "ingrese 4: buscar todos los countries");
-                option1 = Integer.parseInt(read.nextLine());
-                selectFrom(option1);
-
-                break;
-
-            case 3:
                 System.out.println("Please type the name of the .txt file (not incuding the \".txt\"");
 
                 ans = read.nextLine();
 
                 map.importSQL(ans,option);
                 map.autoSave();
+
                 break;
-            case 4:
-                System.out.println("ingrese 1: para seleccionar y organizar paises por población y un atributo\n"+
-                                   "ingrese 2: para seleccionar y organizar ciudades por nombre y un atributo");
-                option1= read.nextInt();
-                orderBy(option1);
+
+            case 3:
+                System.out.println("BYE");
+                break;
+            default:
+                System.out.println("invalid option");
                 break;
         }
     }
 
-    public void insertInto(int option){
+    public void insertInto(int option, String comand){
         try {
             if (option == 1) {
-
-                System.out.println("Ingrese la informacion en el siguiente formato:\n" +
-                        "INSERT INTO countries(id,name,population,countryCode) VALUES ('value','value',value,'value')");
-                read.nextLine();
-                String country = read.nextLine();
-                String[] a = country.split("VALUES");
-                map.comprobateInsertComand(country);
+                String[] a = comand.split("VALUES");
+                map.comprobateInsertComand(comand);
                 String w= a[1];
                 w=w.replace(" (","");
                 w=w.replace(")","");
@@ -95,14 +107,11 @@ public class GeographicMain {
                 double population= Double.parseDouble(comprobate[2]);
                 String code= comprobate[3];
                 map.addCountry(id,name,population,code);
-                map.addserializableCountry(country);
+                map.addserializableCountry(comand);
 
             } else {
-                System.out.println("Ingrese la informacion en el siguiente formato:\n" +
-                        "INSERT INTO cities(id,name,population,countryCode) VALUES ('value','value',value,'value')");
-                read.nextLine();
-                String city = read.nextLine();
-                String[] a = city.split("VALUES");
+
+                String[] a = comand.split("VALUES");
                 map.comprobateInsertComand(a[0]);
                 String w= a[1];
                 w=w.replace(" (","");
@@ -115,7 +124,7 @@ public class GeographicMain {
                 String code= comprobate[2];
                 double population= Double.parseDouble(comprobate[3]);
                 map.addCity(id,name,code,population);
-                map.addserializableCountry(city);
+                map.addserializableCountry(comand);
             }
         }catch (InexistentComandException ex){
             ex.printStackTrace();
@@ -128,12 +137,11 @@ public class GeographicMain {
         }
     }
 
-    public void selectFrom(int option){
-        String comand="";
+    public void selectFrom(int option, String comand){
+
         try {
             if (option==1) {
-                System.out.println("Ingrese la información en el siguiente formato\n"+ "SELECT*FROM cities/countries WHERE name = 'Value'");
-                comand= read.nextLine();
+
                 map.comprobateSelectComand(comand,option);
                 String[] country= comand.split("=");
                 if(country[0].equals( "SELECT*FROM countries WHERE name ")){
@@ -155,8 +163,7 @@ public class GeographicMain {
                 }
 
             }else if(option==2){
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE population > number");
-                comand= read.nextLine();
+
                 map.comprobateSelectComand(comand,option);
                 String []Population= comand.split(">");
                 if(Population[0].equals("SELECT*FROM countries WHERE population ")){
@@ -185,8 +192,7 @@ public class GeographicMain {
                     }
                 }
             }else if(option==3){
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE population < number");
-                comand= read.nextLine();
+
                 map.comprobateSelectComand(comand,option);
                 String []Population= comand.split("<");
                 if(Population[0].equals("SELECT*FROM countries WHERE population ")) {
@@ -215,8 +221,7 @@ public class GeographicMain {
                     }
                 }
             }else{
-                System.out.println("ingrese la información en el siguiente formato\n"+"SELECT*FROM countries/cities WHERE");
-                comand= read.nextLine();
+
                 map.comprobateSelectComand(comand,option);
                 String []Population= comand.split("WHERE");
                 if(Population[0].equals("SELECT*FROM countries ")) {
@@ -244,12 +249,11 @@ public class GeographicMain {
         }
     }
 
-    public void orderBy(int option){
-        String comand="";
+    public void orderBy(int option, String comand){
+
         try {
             if (option == 1) {
-                System.out.println("Ingrese la información en el siguiente formato\n" + "SELECT*FROM countries/cities WHERE population > number ORDER BY atribute");
-                read.nextLine();
+
                 comand = read.nextLine();
                 map.comprobateOrderByComand(comand, option);
                 String[] atribute = comand.split("BY ");
@@ -262,8 +266,7 @@ public class GeographicMain {
                 }
 
             }else{
-                System.out.println("Ingrese la información en el siguiente formato\n"+"SELECT*FROM cities/countries WHERE name = 'Name' ORDER BY atribute");
-                read.nextLine();
+
                 comand= read.nextLine();
                 map.comprobateOrderByComand(comand,option);
                 String[] atribute = comand.split("BY ");
