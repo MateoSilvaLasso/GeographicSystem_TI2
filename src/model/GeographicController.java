@@ -25,6 +25,7 @@ public class GeographicController {
 
     public void addserializableCountry(String s) {
         this.serializable.add(s);
+        autoSave();
     }
 
     public void comprobateInsertComand(String s) throws InexistentComandException {
@@ -57,20 +58,20 @@ public class GeographicController {
             w = w.replace("(", "");
             w = w.replace(") ", "");
             String[] x = w.split(",");
-            if (!x[0].equals("id") || !x[1].equals("name") || !x[2].equals("countryID") || !x[3].equals("population")) {
+            if (!x[0].equals("id") || !x[1].equals(" name") || !x[2].equals(" countryID") || !x[3].equals(" population")) {
                 throw new InexistentComandException(s);
             }
         } else {
             format = n.split("countries");
             String w = format[1];
             w = w.replace("(", "");
-            w = w.replace(")", "");
+            w = w.replace(") ", "");
 
             String[] x = w.split(",");
 
             for (int i = 0; i < x.length; i++) {
                 String c = x[i];
-                if (c.equals("id") || c.equals("name") || c.equals("population") || c.equals("countryCode ")) {
+                if (c.equals("id") || c.equals(" name") || c.equals(" population") || c.equals(" countryCode")) {
 
                 } else {
 
@@ -119,22 +120,22 @@ public class GeographicController {
         String[] arr;
         if (option == 1) {
             arr = s.split("=");
-            if (!arr[0].equals("SELECT*FROM cities WHERE name ") && !arr[0].equals("SELECT*FROM countries WHERE name ")) {
+            if (!arr[0].equals("SELECT * FROM cities WHERE name ") && !arr[0].equals("SELECT * FROM countries WHERE name ")) {
                 throw new InexistentComandException(s);
             }
         } else if (option == 2) {
             arr = s.split(">");
-            if (!arr[0].equals("SELECT*FROM countries WHERE population ") && !arr[0].equals("SELECT*FROM cities WHERE population ")) {
+            if (!arr[0].equals("SELECT * FROM countries WHERE population ") && !arr[0].equals("SELECT * FROM cities WHERE population ")) {
                 throw new InexistentComandException(s);
             }
         } else if (option == 3) {
             arr = s.split("<");
-            if (!arr[0].equals("SELECT*FROM countries WHERE population ") && !arr[0].equals("SELECT*FROM cities WHERE population ")) {
+            if (!arr[0].equals("SELECT * FROM countries WHERE population ") && !arr[0].equals("SELECT * FROM cities WHERE population ")) {
                 throw new InexistentComandException(s);
             }
         }else{
             arr= s.split("WHERE");
-            if(!arr[0].equals("SELECT*FROM countries ") && !arr[0].equals("SELECT*FROM cities ")){
+            if(!arr[0].equals("SELECT * FROM countries") && !arr[0].equals("SELECT * FROM cities")){
                 throw new InexistentComandException(s);
             }
         }
@@ -144,14 +145,28 @@ public class GeographicController {
         String [] arr;
         if(option == 1){
             arr= s.split(" ");
-            if((!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY")) && (!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("population") || (!arr[4].equals(">") && !arr[4].equals("<")) || !arr[6].equals("ORDER") || !arr[7].equals("BY"))){
+            if((!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY"))){
                 throw new InexistentComandException(s);
             }
 
         }else{
             arr= s.split(" ");
-            if((!arr[0].equals("SELECT*FROM") || !arr[1].equals("cities") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY")) && (!arr[0].equals("SELECT*FROM") || !arr[1].equals("countries") || !arr[2].equals("WHERE") || !arr[3].equals("name") || !arr[4].equals("=") || !arr[6].equals("ORDER") || !arr[7].equals("BY"))){
+            if((!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY"))){
                 throw new InexistentComandException(s);
+            }
+        }
+    }
+
+    public void comprobateDelete(int option, String command) throws InexistentComandException{
+        if(option==1){
+            String [] comprobate= command.split(" ");
+            if(!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE")  || !comprobate[5].equals("=")){
+                throw new InexistentComandException(command);
+            }
+        }else{
+            String[]comprobate= command.split(" ");
+            if(!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE") || !comprobate[4].equalsIgnoreCase("population") || (!comprobate[5].equals(">") && !comprobate[5].equals("<")) ){
+                throw new InexistentComandException(command);
             }
         }
     }
@@ -430,10 +445,136 @@ public class GeographicController {
         return all;
     }
 
+    public void deletePlace(int option, String place, String atribute, String value, double population, String m) throws NoAtributeException{
+        if(option==1){
+
+
+            if(place.contains("cities")){
+                if((!atribute.equalsIgnoreCase("name") && !atribute.equalsIgnoreCase("id") && !atribute.equalsIgnoreCase("CountryId") && !atribute.equalsIgnoreCase("population"))){
+                    throw new NoAtributeException(atribute);
+                }
+                if(atribute.equalsIgnoreCase("name")){
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getName().equals(value)){
+                                countries.get(i).getCities().remove(j);
+                            }
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("id")){
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getId().equals(value)){
+                                countries.get(i).getCities().remove(j);
+                            }
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("countryId")){
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getCountryId().equals(atribute)){
+                                countries.get(i).getCities().remove(j);
+                            }
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("population")){
+                    double p= Double.parseDouble(value);
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getPopulation()==p){
+                                countries.get(i).getCities().remove(j);
+                            }
+                        }
+                    }
+                }
+            }else{
+                if(!atribute.equalsIgnoreCase("name") && !atribute.equalsIgnoreCase("id") && !atribute.equalsIgnoreCase("population") && !atribute.equalsIgnoreCase("CountryCode")){
+                    throw new NoAtributeException(atribute);
+                }
+                if(atribute.equalsIgnoreCase("name")){
+                    for(int i=0; i<countries.size(); i++){
+                        if(countries.get(i).getName().equals(value)){
+                            countries.remove(i);
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("id")){
+                    for(int i=0; i<countries.size(); i++){
+                        if(countries.get(i).getId().equals(value)){
+                            countries.remove(i);
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("population")){
+
+                    double p= Double.parseDouble(value);
+                    for(int i=0; i<countries.size(); i++){
+                        if(countries.get(i).getPopulation()==p){
+                            countries.remove(i);
+                        }
+                    }
+                }
+                if(atribute.equalsIgnoreCase("CountryCode")){
+
+
+                    for(int i=0; i<countries.size(); i++){
+                        if(countries.get(i).getCountryCode().equals(value)){
+                            countries.remove(i);
+                        }
+                    }
+                }
+            }
+
+        }else{
+            if(place.contains("cities")){
+                if(m.equals("<")){
+
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getPopulation()<population) {
+                                countries.get(i).getCities().remove(j);
+                                j--;
+                            }
+                        }
+                    }
+                }else{
+                    for(int i=0; i<countries.size(); i++){
+                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                            if(countries.get(i).getCities().get(j).getPopulation()>population) {
+                                countries.get(i).getCities().remove(j);
+                                j--;
+                            }
+                        }
+                    }
+                }
+
+            }else{
+                if(m.equals("<")){
+                    for(int i=0; i<countries.size(); i++) {
+                        if(countries.get(i).getPopulation() < population){ countries.remove(i); i--;}
+                    }
+                }else{
+                    for(int i=0; i<countries.size(); i++) {
+                        if(countries.get(i).getPopulation() > population) {countries.remove(i); i--;}
+                    }
+                }
+
+
+            }
+        }
+    }
+
 
 
     public ArrayList<String> getCountries() {
-        return this.serializable;
+        ArrayList<String> arr= new ArrayList<>();
+        for(int i=0; i<countries.size(); i++){
+            arr.add(countries.get(i).getName() + " " + countries.get(i).getPopulation());
+        }
+        return arr;
     }
 
     public ArrayList<String> getCities(){
@@ -488,6 +629,7 @@ public class GeographicController {
                             String values= comand[1];
                             values= values.replace(" (", "");
                             values= values.replace(")","");
+                            values= values.replace(" ","");
                             String[] atributes= values.split(",");
                             comprobateIdCountry(atributes[2]);
                             String id= atributes[0];
