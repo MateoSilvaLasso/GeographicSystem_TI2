@@ -264,14 +264,14 @@ public class GeographicController {
             ArrayList<Country> arr= new ArrayList<>();
             ArrayList<City> ar= new ArrayList<>();
             String[] comprobate= comand.split(" ");
-            if(comprobate[1].equals("countries")) {
-                if (comprobate[4].equals("<")) {
+            if(comprobate[3].equals("countries")) {
+                if (comprobate[6].equals("<")) {
                     for (int i = 0; i < countries.size(); i++) {
                         if (countries.get(i).getPopulation() < number) {
                             arr.add(countries.get(i));
                         }
                     }
-                } else if (comprobate[4].equals(">")) {
+                } else if (comprobate[6].equals(">")) {
                     for (int i = 0; i < countries.size(); i++) {
                         if (countries.get(i).getPopulation() > number) {
                             arr.add(countries.get(i));
@@ -307,7 +307,7 @@ public class GeographicController {
                     all.add(objetive);
                 }
             }else{
-                if(comprobate[4].equals("<")){
+                if(comprobate[6].equals("<")){
                     for (int i = 0; i < countries.size(); i++) {
                         //if (countries.get(i).getPopulation() < number) {
                           //  arr.add(countries.get(i));
@@ -318,7 +318,7 @@ public class GeographicController {
                             }
                         }
                     }
-                } else if (comprobate[4].equals(">")) {
+                } else if (comprobate[6].equals(">")) {
                     for (int i = 0; i < countries.size(); i++) {
                         for(int j=0; j<countries.get(i).getCities().size(); j++){
                             if (countries.get(i).getCities().get(j).getPopulation() > number) {
@@ -366,7 +366,7 @@ public class GeographicController {
             ArrayList<City> arr= new ArrayList<>();
             ArrayList<Country> ar= new ArrayList<>();
             String[] comprobate= comand.split(" ");
-            if(comprobate[1].equals("cities")) {
+            if(comprobate[3].equals("cities")) {
                 for (int i = 0; i < countries.size(); i++) {
                     for (int j = 0; j < countries.get(i).getCities().size(); j++) {
                         if (countries.get(i).getCities().get(j).getName().equals(name)) {
@@ -432,7 +432,7 @@ public class GeographicController {
                     });
                 }
 
-                for (int i = 0; i < arr.size(); i++) {
+                for (int i = 0; i < ar.size(); i++) {
                     String objetive = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
                     all.add(objetive);
                 }
@@ -458,6 +458,7 @@ public class GeographicController {
                         for(int j=0; j<countries.get(i).getCities().size(); j++){
                             if(countries.get(i).getCities().get(j).getName().equals(value)){
                                 countries.get(i).getCities().remove(j);
+                                j--;
                             }
                         }
                     }
@@ -467,6 +468,7 @@ public class GeographicController {
                         for(int j=0; j<countries.get(i).getCities().size(); j++){
                             if(countries.get(i).getCities().get(j).getId().equals(value)){
                                 countries.get(i).getCities().remove(j);
+                                j--;
                             }
                         }
                     }
@@ -476,6 +478,7 @@ public class GeographicController {
                         for(int j=0; j<countries.get(i).getCities().size(); j++){
                             if(countries.get(i).getCities().get(j).getCountryId().equals(atribute)){
                                 countries.get(i).getCities().remove(j);
+                                j--;
                             }
                         }
                     }
@@ -486,6 +489,7 @@ public class GeographicController {
                         for(int j=0; j<countries.get(i).getCities().size(); j++){
                             if(countries.get(i).getCities().get(j).getPopulation()==p){
                                 countries.get(i).getCities().remove(j);
+                                j--;
                             }
                         }
                     }
@@ -498,6 +502,7 @@ public class GeographicController {
                     for(int i=0; i<countries.size(); i++){
                         if(countries.get(i).getName().equals(value)){
                             countries.remove(i);
+                            i--;
                         }
                     }
                 }
@@ -505,6 +510,7 @@ public class GeographicController {
                     for(int i=0; i<countries.size(); i++){
                         if(countries.get(i).getId().equals(value)){
                             countries.remove(i);
+                            i--;
                         }
                     }
                 }
@@ -514,6 +520,7 @@ public class GeographicController {
                     for(int i=0; i<countries.size(); i++){
                         if(countries.get(i).getPopulation()==p){
                             countries.remove(i);
+                            i--;
                         }
                     }
                 }
@@ -523,6 +530,7 @@ public class GeographicController {
                     for(int i=0; i<countries.size(); i++){
                         if(countries.get(i).getCountryCode().equals(value)){
                             countries.remove(i);
+                            i--;
                         }
                     }
                 }
@@ -617,6 +625,7 @@ public class GeographicController {
                             String values= comand[1];
                             values= values.replace(" (", "");
                             values= values.replace(")","");
+                            values= values.replace(" ","");
                             String[] atributes= values.split(",");
                             String id=atributes[0];
                             String name= atributes[1];

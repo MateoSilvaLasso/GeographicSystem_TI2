@@ -57,7 +57,7 @@ public class GeographicMain {
                         } else {
                             insertInto(2, comand);
                         }
-                    } else if (comand.contains("SELECT*FROM") && !comand.contains("ORDER")) {
+                    } else if (comand.contains("SELECT * FROM") && !comand.contains("ORDER")) {
 
                         if (comand.contains("name")) {
                             selectFrom(1, comand);
@@ -116,6 +116,7 @@ public class GeographicMain {
                 w=w.replace(" (","");
                 w=w.replace(")","");
                 w=w.replace(" ","");
+                System.out.println(w);
                 String []comprobate= w.split(",");
                 String id=comprobate[0];
                 String name= comprobate[1];
@@ -276,7 +277,7 @@ public class GeographicMain {
                 String[] atribute = comand.split("BY ");
                 map.comprobateAtribute(atribute[1],option);
                 String [] criteria= comand.split(" ");
-                double cr= Double.parseDouble(criteria[5]);
+                double cr= Double.parseDouble(criteria[7]);
                 ArrayList<String> arr= map.orderSelection(option,comand,cr,"",atribute[1]);
                 for(int i=0; i<arr.size(); i++){
                     System.out.println(arr.get(i));
@@ -289,7 +290,7 @@ public class GeographicMain {
                 String[] atribute = comand.split("BY ");
                 map.comprobateAtribute(atribute[1],option);
                 String [] criteria= comand.split(" ");
-                String name= criteria[5];
+                String name= criteria[7];
                 ArrayList<String> arr= map.orderSelection(option,comand,0,name,atribute[1]);
                 for(int i=0; i<arr.size(); i++){
                     System.out.println(arr.get(i));
