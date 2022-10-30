@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
-import Exception.IncorrectFormatExcepcion;
+import exception.IncorrectFormatException;
 
 public class Country implements Comparable<Country> {
 
@@ -14,24 +14,24 @@ public class Country implements Comparable<Country> {
 
     private ArrayList<City> cities;
 
-    public Country(String id, String name, double population, String countryCode) throws IncorrectFormatExcepcion {
+    public Country(String id, String name, double population, String countryCode) throws IncorrectFormatException {
         if(id.charAt(0)!=39 && id.charAt(id.length()-1)!=39)
-            throw new IncorrectFormatExcepcion(id);
+            throw new IncorrectFormatException(id);
         else
             this.id = id;
         if(name.charAt(0)!=39 && name.charAt(name.length()-1)!=39)
-            throw new IncorrectFormatExcepcion(name);
+            throw new IncorrectFormatException(name);
         else
             this.name = name;
         this.population = population;
         if(countryCode.charAt(0)!=39 && countryCode.charAt(countryCode.length()-1)!=39 && countryCode.charAt(1)!=43)
-            throw new IncorrectFormatExcepcion(countryCode);
+            throw new IncorrectFormatException(countryCode);
         else
             this.countryCode = countryCode;
         this.cities= new ArrayList<>();
     }
 
-    public boolean addCity(City city) throws IncorrectFormatExcepcion{
+    public boolean addCity(City city) throws IncorrectFormatException{
         return cities.add(city);
     }
 

@@ -1,6 +1,6 @@
 package model;
 
-import Exception.IncorrectFormatExcepcion;
+import exception.IncorrectFormatExcepcion;
 
 public class City implements Comparable<City> {
     private String id;

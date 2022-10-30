@@ -1,7 +1,7 @@
-package Exception;
+package exception;
 
 public class NoCountryIDException extends RuntimeException{
     public NoCountryIDException(String id){
-        super("El id "+id+" no esta en el sistema");
+        super("The id "+id+" is not in the system.");
     }
 }

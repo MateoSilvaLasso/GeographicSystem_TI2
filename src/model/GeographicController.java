@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.io.*;
 import java.util.Collections;
 
-import Exception.*;
+import exception.*;
 import com.google.gson.Gson;
 
 public class GeographicController {
@@ -18,17 +18,22 @@ public class GeographicController {
         this.serializable = new ArrayList<String>();
     }
 
-    public void addCountry(String id, String name, double population, String countryCode) throws IncorrectFormatExcepcion {
+    public void addCountry(String id, String name, double population, String countryCode) throws IdAlreadyUsedException {
         Country e = new Country(id, name, population, countryCode);
+        for (Country c : countries) {
+            if (c.getId().equals(e.getId())) {
+                throw new IdAlreadyUsedException(id);
+            }
+        }
         this.countries.add(e);
     }
 
-    public void addserializableCountry(String s) {
+    public void addSerializableCountry(String s) {
         this.serializable.add(s);
         autoSave();
     }
 
-    public void comprobateInsertComand(String s) throws InexistentComandException {
+    public void comprobateInsertComand(String s) throws InexistentCommandException {
         String[] arr = s.split("VALUES");
         String n = arr[0];
         String a = "";
@@ -36,17 +41,8 @@ public class GeographicController {
             a += n.charAt(i);
         }
         if (!a.equals("INSERT INTO cities") && !a.equals("INSERT INTO countr")) {
-            throw new InexistentComandException(s);
+            throw new InexistentCommandException(s);
         } else if (a.equals("INSERT INTO countries")) {
-            /*
-            String b="";
-            for(int i=19;i<21;i++){
-                b+=s.charAt(i);
-            }
-            if(!b.equals("ies")){
-                throw new InexistentComandException(s);
-            }
-            */
 
         }
 
@@ -59,7 +55,7 @@ public class GeographicController {
             w = w.replace(") ", "");
             String[] x = w.split(",");
             if (!x[0].equals("id") || !x[1].equals(" name") || !x[2].equals(" countryID") || !x[3].equals(" population")) {
-                throw new InexistentComandException(s);
+                throw new InexistentCommandException(s);
             }
         } else {
             format = n.split("countries");
@@ -75,33 +71,72 @@ public class GeographicController {
 
                 } else {
 
-                    throw new InexistentComandException(s);
+                    throw new InexistentCommandException(s);
                 }
-
-            }
-            /*
-            if(!x[0].equals(" id") || !x[1].equals(" name") || !x[2].equals(" population") || !x[3].equals(" countryCode")){
-                throw new InexistentComandException(s);
-            }
-            */
-        }
-
-    }
-
-    public void comprobateAtribute(String s, int option)throws NoAtributeException {
-        if(option==1){
-            if(!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryCode")){
-                throw new NoAtributeException(s);
-            }
-        }else{
-            if(!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryId")){
-                throw new NoAtributeException(s);
             }
         }
     }
 
-    public void comprobateIdCountry(String s) throws NoCountryIDException {
+    public void insertInto(int option, String command) {
+        try {
+            if (option == 1) {
+                String[] a = command.split("VALUES");
+                comprobateInsertComand(command);
+                String w = a[1];
+                w = w.replace(" (", "");
+                w = w.replace(")", "");
+                w = w.replace(" ", "");
+                System.out.println(w);
+                String[] comprobate = w.split(",");
+                String id = comprobate[0];
+                String name = comprobate[1];
+                double population = Double.parseDouble(comprobate[2]);
+                String code = comprobate[3];
+                addCountry(id, name, population, code);
+                addSerializableCountry(command);
 
+            } else {
+
+                String[] a = command.split("VALUES");
+                comprobateInsertComand(a[0]);
+                String w = a[1];
+                w = w.replace(" (", "");
+                w = w.replace(")", "");
+                w = w.replace(" ", "");
+                String[] comprobate = w.split(",");
+
+                checkCountryId(comprobate[2]);
+                String id = comprobate[0];
+                String name = comprobate[1];
+                String code = comprobate[2];
+                double population = Double.parseDouble(comprobate[3]);
+                addCity(id, name, code, population);
+                addSerializableCountry(command);
+            }
+        } catch (InexistentCommandException ex) {
+            ex.printStackTrace();
+        } catch (IncorrectFormatException ex) {
+            ex.printStackTrace();
+        } catch (NoCountryIDException ex) {
+            ex.printStackTrace();
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void checkAttribute(String s, int option) throws NoAttributeException {
+        if (option == 1) {
+            if (!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryCode")) {
+                throw new NoAttributeException(s);
+            }
+        } else {
+            if (!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryId")) {
+                throw new NoAttributeException(s);
+            }
+        }
+    }
+
+    public void checkCountryId(String s) throws NoCountryIDException {
         boolean flag = false;
 
         for (int i = 0; i < countries.size() && !flag; i++) {
@@ -113,70 +148,186 @@ public class GeographicController {
         if (!flag) {
             throw new NoCountryIDException(s);
         }
-
     }
 
-    public void comprobateSelectComand(String s, int option) throws InexistentComandException {
+    public void checkSelectCommand(String s, int option) throws InexistentCommandException {
         String[] arr;
         if (option == 1) {
             arr = s.split("=");
             if (!arr[0].equals("SELECT * FROM cities WHERE name ") && !arr[0].equals("SELECT * FROM countries WHERE name ")) {
-                throw new InexistentComandException(s);
+                throw new InexistentCommandException(s);
             }
         } else if (option == 2) {
             arr = s.split(">");
             if (!arr[0].equals("SELECT * FROM countries WHERE population ") && !arr[0].equals("SELECT * FROM cities WHERE population ")) {
-                throw new InexistentComandException(s);
+                throw new InexistentCommandException(s);
             }
         } else if (option == 3) {
             arr = s.split("<");
             if (!arr[0].equals("SELECT * FROM countries WHERE population ") && !arr[0].equals("SELECT * FROM cities WHERE population ")) {
-                throw new InexistentComandException(s);
+                throw new InexistentCommandException(s);
             }
-        }else{
-            arr= s.split("WHERE");
-            if(!arr[0].equals("SELECT * FROM countries") && !arr[0].equals("SELECT * FROM cities")){
-                throw new InexistentComandException(s);
-            }
-        }
-    }
-
-    public void comprobateOrderByComand(String s,  int option) throws InexistentComandException{
-        String [] arr;
-        if(option == 1){
-            arr= s.split(" ");
-            if((!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY"))){
-                throw new InexistentComandException(s);
-            }
-
-        }else{
-            arr= s.split(" ");
-            if((!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") ||!arr[1].equals("*") ||!arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY"))){
-                throw new InexistentComandException(s);
+        } else {
+            arr = s.split("WHERE");
+            if (!arr[0].equals("SELECT * FROM countries") && !arr[0].equals("SELECT * FROM cities")) {
+                throw new InexistentCommandException(s);
             }
         }
     }
 
-    public void comprobateDelete(int option, String command) throws InexistentComandException{
-        if(option==1){
-            String [] comprobate= command.split(" ");
-            if(!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE")  || !comprobate[5].equals("=")){
-                throw new InexistentComandException(command);
+    public void selectFrom(int option, String command) {
+
+        try {
+            if (option == 1) {
+
+                checkSelectCommand(command, option);
+                String[] country = command.split("=");
+                if (country[0].equals("SELECT * FROM countries WHERE name ")) {
+                    String t = country[1];
+                    t = t.replace(" ", "");
+                    if (searchCountry(t)) {
+                        System.out.println("The country exists");
+                    } else {
+                        System.out.println("The country doesn't exist");
+                    }
+                } else {
+                    String t = country[1];
+                    t = t.replace(" ", "");
+                    if (searchCity(t)) {
+                        System.out.println("The city exists");
+                    } else {
+                        System.out.println("The city doesn't exist");
+                    }
+                }
+
+            } else if (option == 2) {
+
+                checkSelectCommand(command, option);
+                String[] Population = command.split(">");
+                if (Population[0].equals("SELECT * FROM countries WHERE population ")) {
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double pop = Double.parseDouble(w);
+                    ArrayList<String> arr = searchBigPopulation(pop);
+                    if (arr.isEmpty()) {
+                        System.out.println("There isn't a country with a population greater than " + pop + " millions");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                } else {
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double pop = Double.parseDouble(w);
+                    ArrayList<String> arr = searchBigCityPopulation(pop);
+                    if (arr.isEmpty()) {
+                        System.out.println("There isn't a city with a population greater than " + pop + " millions");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                }
+            } else if (option == 3) {
+
+                checkSelectCommand(command, option);
+                String[] Population = command.split("<");
+                if (Population[0].equals("SELECT * FROM countries WHERE population ")) {
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double minPop = Double.parseDouble(w);
+                    ArrayList<String> arr = searchMinPopulation(minPop);
+                    if (arr.isEmpty()) {
+                        System.out.println("There isn't a country with a population lesser than " + minPop + " millions");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                } else {
+                    String w = Population[1];
+                    w = w.replace(" ", "");
+                    double minPop = Double.parseDouble(w);
+                    ArrayList<String> arr = searchMinCityPopulation(minPop);
+                    if (arr.isEmpty()) {
+                        System.out.println("There isn't a city with a population lesser than " + minPop + " millions");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                }
+            } else {
+
+                checkSelectCommand(command, option);
+                String[] Population = command.split("WHERE");
+                if (Population[0].equals("SELECT * FROM countries")) {
+                    ArrayList<String> arr = getCountries();
+                    if (arr.isEmpty()) {
+                        System.out.println("There are no countries");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                } else {
+                    ArrayList<String> arr = getCities();
+                    if (arr.isEmpty()) {
+                        System.out.println("There are no cities");
+                    } else {
+                        for (int i = 0; i < arr.size(); i++) {
+                            System.out.println(arr.get(i));
+                        }
+                    }
+                }
             }
-        }else{
-            String[]comprobate= command.split(" ");
-            if(!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE") || !comprobate[4].equalsIgnoreCase("population") || (!comprobate[5].equals(">") && !comprobate[5].equals("<")) ){
-                throw new InexistentComandException(command);
+        } catch (InexistentCommandException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void checkOrderByCommand(String s, int option) throws InexistentCommandException {
+        String[] arr;
+        if (option == 1) {
+            arr = s.split(" ");
+            if ((!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("population") || (!arr[6].equals(">") && !arr[6].equals("<")) || !arr[8].equals("ORDER") || !arr[9].equals("BY"))) {
+                throw new InexistentCommandException(s);
+            }
+
+        } else {
+            arr = s.split(" ");
+            if ((!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY"))) {
+                throw new InexistentCommandException(s);
             }
         }
     }
 
-    public void addCity(String id, String name, String CountryCode, double population) throws IncorrectFormatExcepcion {
+    public void checkDelete(int option, String command) throws InexistentCommandException {
+        if (option == 1) {
+            String[] comprobate = command.split(" ");
+            if (!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE") || !comprobate[5].equals("=")) {
+                throw new InexistentCommandException(command);
+            }
+        } else {
+            String[] comprobate = command.split(" ");
+            if (!comprobate[0].equals("DELETE") || !comprobate[1].equals("FROM") || (!comprobate[2].equals("countries") && !comprobate[2].equals("cities")) || !comprobate[3].equals("WHERE") || !comprobate[4].equalsIgnoreCase("population") || (!comprobate[5].equals(">") && !comprobate[5].equals("<"))) {
+                throw new InexistentCommandException(command);
+            }
+        }
+    }
 
-        City city = new City(id, name, CountryCode, population);
+    public void addCity(String id, String name, String countryCode, double population) throws IncorrectFormatExcepcion {
 
+        City city = new City(id, name, countryCode, population);
+        Country c = searchCountryId(countryCode);
         for (int i = 0; i < countries.size(); i++) {
-            if (countries.get(i).getId().equals(CountryCode)) {
+            if (countries.get(i).getId().equals(countryCode)) {
+                for (City x : c.getCities()) {
+                    if (c.getId().equals(x.getId())) {
+                        throw new IdAlreadyUsedException(id);
+                    }
+                }
                 countries.get(i).addCity(city);
             }
         }
@@ -196,13 +347,23 @@ public class GeographicController {
         return flag;
     }
 
-    public boolean searchCity(String s){
-        boolean flag= false;
+    public Country searchCountryId(String s) {
 
-        for(int i=0; i<countries.size(); i++){
-            for(int j=0; j<countries.get(i).getCities().size(); j++){
-                if(countries.get(i).getCities().get(j).getName().equals(s)){
-                    flag=true;
+        for (int i = 0; i < countries.size(); i++) {
+            if (countries.get(i).getId().equals(s)) {
+                return countries.get(i);
+            }
+        }
+        return null;
+    }
+
+    public boolean searchCity(String s) {
+        boolean flag = false;
+
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                if (countries.get(i).getCities().get(j).getName().equals(s)) {
+                    flag = true;
                 }
             }
         }
@@ -222,11 +383,11 @@ public class GeographicController {
         return pop;
     }
 
-    public ArrayList<String> searchBigCPopulation(double p){
+    public ArrayList<String> searchBigCityPopulation(double p) {
         ArrayList<String> pop = new ArrayList<>();
-        for(int i=0; i<countries.size(); i++){
-            for(int j=0; j<countries.get(i).getCities().size(); j++){
-                if(countries.get(i).getCities().get(j).getPopulation()>p){
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                if (countries.get(i).getCities().get(j).getPopulation() > p) {
                     pop.add(countries.get(i).getCities().get(j).getName());
                 }
             }
@@ -238,18 +399,18 @@ public class GeographicController {
     public ArrayList<String> searchMinPopulation(double p) {
         ArrayList<String> pop = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
-            if(countries.get(i).getPopulation()<=p)
+            if (countries.get(i).getPopulation() <= p)
                 pop.add(countries.get(i).getName());
         }
 
         return pop;
     }
 
-    public ArrayList<String> searchMinCPopulation(double p){
-        ArrayList<String> pop= new ArrayList<>();
-        for(int i=0; i<countries.size(); i++){
-            for(int j=0; j<countries.get(i).getCities().size(); j++){
-                if(countries.get(i).getCities().get(j).getPopulation()<p){
+    public ArrayList<String> searchMinCityPopulation(double p) {
+        ArrayList<String> pop = new ArrayList<>();
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                if (countries.get(i).getCities().get(j).getPopulation() < p) {
                     pop.add(countries.get(i).getCities().get(j).getName());
                 }
             }
@@ -258,20 +419,58 @@ public class GeographicController {
         return pop;
     }
 
-    public ArrayList<String> orderSelection(int option, String comand, double number,String name, String atribute){
-        ArrayList<String> all= new ArrayList<>();
-        if(option==1){
-            ArrayList<Country> arr= new ArrayList<>();
-            ArrayList<City> ar= new ArrayList<>();
-            String[] comprobate= comand.split(" ");
-            if(comprobate[3].equals("countries")) {
-                if (comprobate[6].equals("<")) {
+    public void orderBy(int option, String command) {
+
+        try {
+            if (option == 1) {
+                checkOrderByCommand(command, option);
+                String[] attribute = command.split("BY ");
+                checkAttribute(attribute[1], option);
+                String[] criteria = command.split(" ");
+                double cr = Double.parseDouble(criteria[7]);
+                ArrayList<String> arr = orderSelection(option, command, cr, "", attribute[1]);
+                for (int i = 0; i < arr.size(); i++) {
+                    System.out.println(arr.get(i));
+                }
+
+            } else {
+
+
+                checkOrderByCommand(command, option);
+                String[] attribute = command.split("BY ");
+                checkAttribute(attribute[1], option);
+                String[] criteria = command.split(" ");
+                String name = criteria[7];
+                ArrayList<String> arr = orderSelection(option, command, 0, name, attribute[1]);
+                for (int i = 0; i < arr.size(); i++) {
+                    System.out.println(arr.get(i));
+                }
+
+            }
+        } catch (InexistentCommandException ex) {
+            ex.printStackTrace();
+        } catch (NoAttributeException ex) {
+            ex.printStackTrace();
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            ex.getMessage();
+        }
+    }
+
+    public ArrayList<String> orderSelection(int option, String command, double number, String name, String attribute) {
+        ArrayList<String> all = new ArrayList<>();
+        if (option == 1) {
+            ArrayList<Country> arr = new ArrayList<>();
+            ArrayList<City> ar = new ArrayList<>();
+            String[] check = command.split(" ");
+            if (check[3].equals("countries")) {
+                if (check[6].equals("<")) {
                     for (int i = 0; i < countries.size(); i++) {
                         if (countries.get(i).getPopulation() < number) {
                             arr.add(countries.get(i));
                         }
                     }
-                } else if (comprobate[6].equals(">")) {
+                } else if (check[6].equals(">")) {
                     for (int i = 0; i < countries.size(); i++) {
                         if (countries.get(i).getPopulation() > number) {
                             arr.add(countries.get(i));
@@ -279,15 +478,15 @@ public class GeographicController {
                     }
                 }
 
-                if (atribute.equals("id")) {
+                if (attribute.equals("id")) {
                     Collections.sort(arr, (a, b) -> {
                         return a.getId().compareTo(b.getId());
                     });
-                } else if (atribute.equals("name")) {
+                } else if (attribute.equals("name")) {
                     Collections.sort(arr, (a, b) -> {
                         return a.getName().compareTo(b.getName());
                     });
-                } else if (atribute.equals("population")) {
+                } else if (attribute.equals("population")) {
                     Collections.sort(arr, (a, b) -> {
                         if (a.getPopulation() < b.getPopulation()) {
                             return -1;
@@ -303,24 +502,21 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < arr.size(); i++) {
-                    String objetive = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getPopulation() + ", " + arr.get(i).getCountryCode();
-                    all.add(objetive);
+                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getPopulation() + ", " + arr.get(i).getCountryCode();
+                    all.add(target);
                 }
-            }else{
-                if(comprobate[6].equals("<")){
+            } else {
+                if (check[6].equals("<")) {
                     for (int i = 0; i < countries.size(); i++) {
-                        //if (countries.get(i).getPopulation() < number) {
-                          //  arr.add(countries.get(i));
-                        //}
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getPopulation() < number){
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getPopulation() < number) {
                                 ar.add(countries.get(i).getCities().get(j));
                             }
                         }
                     }
-                } else if (comprobate[6].equals(">")) {
+                } else if (check[6].equals(">")) {
                     for (int i = 0; i < countries.size(); i++) {
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
                             if (countries.get(i).getCities().get(j).getPopulation() > number) {
                                 ar.add(countries.get(i).getCities().get(j));
                             }
@@ -330,15 +526,15 @@ public class GeographicController {
                     }
                 }
 
-                if (atribute.equals("id")) {
+                if (attribute.equals("id")) {
                     Collections.sort(ar, (a, b) -> {
                         return a.getId().compareTo(b.getId());
                     });
-                } else if (atribute.equals("name")) {
+                } else if (attribute.equals("name")) {
                     Collections.sort(ar, (a, b) -> {
                         return a.getName().compareTo(b.getName());
                     });
-                } else if (atribute.equals("population")) {
+                } else if (attribute.equals("population")) {
                     Collections.sort(ar, (a, b) -> {
                         if (a.getPopulation() < b.getPopulation()) {
                             return -1;
@@ -354,37 +550,35 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < ar.size(); i++) {
-                    String objetive = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getPopulation() + ", " + ar.get(i).getCountryId();
-                    all.add(objetive);
+                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getPopulation() + ", " + ar.get(i).getCountryId();
+                    all.add(target);
                 }
-
 
 
             }
 
-        }else{
-            ArrayList<City> arr= new ArrayList<>();
-            ArrayList<Country> ar= new ArrayList<>();
-            String[] comprobate= comand.split(" ");
-            if(comprobate[3].equals("cities")) {
+        } else {
+            ArrayList<City> arr = new ArrayList<>();
+            ArrayList<Country> ar = new ArrayList<>();
+            String[] check = command.split(" ");
+            if (check[3].equals("cities")) {
                 for (int i = 0; i < countries.size(); i++) {
                     for (int j = 0; j < countries.get(i).getCities().size(); j++) {
                         if (countries.get(i).getCities().get(j).getName().equals(name)) {
-                            //System.out.println();
                             arr.add(countries.get(i).getCities().get(j));
                         }
                     }
                 }
 
-                if (atribute.equals("id")) {
+                if (attribute.equals("id")) {
                     Collections.sort(arr, (a, b) -> {
                         return a.getId().compareTo(b.getId());
                     });
-                } else if (atribute.equals("name")) {
+                } else if (attribute.equals("name")) {
                     Collections.sort(arr, (a, b) -> {
                         return a.getName().compareTo(b.getName());
                     });
-                } else if (atribute.equals("countryId")) {
+                } else if (attribute.equals("countryId")) {
                     Collections.sort(arr, (a, b) -> {
                         return a.getCountryId().compareTo(b.getCountryId());
                     });
@@ -399,26 +593,25 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < arr.size(); i++) {
-                    String objetive = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getCountryId() + ", " + arr.get(i).getPopulation();
-                    all.add(objetive);
+                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getCountryId() + ", " + arr.get(i).getPopulation();
+                    all.add(target);
                 }
-            }else{
-                for(int i=0; i<countries.size(); i++){
+            } else {
+                for (int i = 0; i < countries.size(); i++) {
                     if (countries.get(i).getName().equals(name)) {
-                        //System.out.println();
                         ar.add(countries.get(i));
                     }
                 }
 
-                if (atribute.equals("id")) {
+                if (attribute.equals("id")) {
                     Collections.sort(ar, (a, b) -> {
                         return a.getId().compareTo(b.getId());
                     });
-                } else if (atribute.equals("name")) {
+                } else if (attribute.equals("name")) {
                     Collections.sort(ar, (a, b) -> {
                         return a.getName().compareTo(b.getName());
                     });
-                } else if (atribute.equals("countryId")) {
+                } else if (attribute.equals("countryId")) {
                     Collections.sort(ar, (a, b) -> {
                         return a.getCountryCode().compareTo(b.getCountryCode());
                     });
@@ -433,8 +626,8 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < ar.size(); i++) {
-                    String objetive = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
-                    all.add(objetive);
+                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
+                    all.add(target);
                 }
 
             }
@@ -445,90 +638,114 @@ public class GeographicController {
         return all;
     }
 
-    public void deletePlace(int option, String place, String atribute, String value, double population, String m) throws NoAtributeException{
-        if(option==1){
+    public void delete(int option, String command) {
+        try {
+            if (option == 1) {
+                checkDelete(option, command);
+                String[] check = command.split(" ");
+                if (check[4].equalsIgnoreCase("population")) {
+                    String pop = String.valueOf(check[6]);
+                    deletePlace(option, check[2], check[4], pop, 0, "");
+                } else {
+                    deletePlace(option, check[2], check[4], check[6], 0, "");
+                }
+            } else {
+                checkDelete(option, command);
+                String[] check = command.split(" ");
+                double pop = Double.parseDouble(check[6]);
+                deletePlace(option, check[2], "", "", pop, check[5]);
+            }
+        } catch (InexistentCommandException ex) {
+            ex.printStackTrace();
+        } catch (NoAttributeException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void deletePlace(int option, String place, String attribute, String value, double population, String m) throws NoAttributeException {
+        if (option == 1) {
 
 
-            if(place.contains("cities")){
-                if((!atribute.equalsIgnoreCase("name") && !atribute.equalsIgnoreCase("id") && !atribute.equalsIgnoreCase("CountryId") && !atribute.equalsIgnoreCase("population"))){
-                    throw new NoAtributeException(atribute);
+            if (place.contains("cities")) {
+                if ((!attribute.equalsIgnoreCase("name") && !attribute.equalsIgnoreCase("id") && !attribute.equalsIgnoreCase("CountryId") && !attribute.equalsIgnoreCase("population"))) {
+                    throw new NoAttributeException(attribute);
                 }
-                if(atribute.equalsIgnoreCase("name")){
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getName().equals(value)){
+                if (attribute.equalsIgnoreCase("name")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getName().equals(value)) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("id")){
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getId().equals(value)){
+                if (attribute.equalsIgnoreCase("id")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getId().equals(value)) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("countryId")){
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getCountryId().equals(atribute)){
+                if (attribute.equalsIgnoreCase("countryId")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getCountryId().equals(attribute)) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("population")){
-                    double p= Double.parseDouble(value);
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getPopulation()==p){
+                if (attribute.equalsIgnoreCase("population")) {
+                    double p = Double.parseDouble(value);
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getPopulation() == p) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
                         }
                     }
                 }
-            }else{
-                if(!atribute.equalsIgnoreCase("name") && !atribute.equalsIgnoreCase("id") && !atribute.equalsIgnoreCase("population") && !atribute.equalsIgnoreCase("CountryCode")){
-                    throw new NoAtributeException(atribute);
+            } else {
+                if (!attribute.equalsIgnoreCase("name") && !attribute.equalsIgnoreCase("id") && !attribute.equalsIgnoreCase("population") && !attribute.equalsIgnoreCase("CountryCode")) {
+                    throw new NoAttributeException(attribute);
                 }
-                if(atribute.equalsIgnoreCase("name")){
-                    for(int i=0; i<countries.size(); i++){
-                        if(countries.get(i).getName().equals(value)){
+                if (attribute.equalsIgnoreCase("name")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getName().equals(value)) {
                             countries.remove(i);
                             i--;
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("id")){
-                    for(int i=0; i<countries.size(); i++){
-                        if(countries.get(i).getId().equals(value)){
+                if (attribute.equalsIgnoreCase("id")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getId().equals(value)) {
                             countries.remove(i);
                             i--;
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("population")){
+                if (attribute.equalsIgnoreCase("population")) {
 
-                    double p= Double.parseDouble(value);
-                    for(int i=0; i<countries.size(); i++){
-                        if(countries.get(i).getPopulation()==p){
+                    double p = Double.parseDouble(value);
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getPopulation() == p) {
                             countries.remove(i);
                             i--;
                         }
                     }
                 }
-                if(atribute.equalsIgnoreCase("CountryCode")){
+                if (attribute.equalsIgnoreCase("CountryCode")) {
 
 
-                    for(int i=0; i<countries.size(); i++){
-                        if(countries.get(i).getCountryCode().equals(value)){
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getCountryCode().equals(value)) {
                             countries.remove(i);
                             i--;
                         }
@@ -536,22 +753,22 @@ public class GeographicController {
                 }
             }
 
-        }else{
-            if(place.contains("cities")){
-                if(m.equals("<")){
+        } else {
+            if (place.contains("cities")) {
+                if (m.equals("<")) {
 
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getPopulation()<population) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getPopulation() < population) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
                         }
                     }
-                }else{
-                    for(int i=0; i<countries.size(); i++){
-                        for(int j=0; j<countries.get(i).getCities().size(); j++){
-                            if(countries.get(i).getCities().get(j).getPopulation()>population) {
+                } else {
+                    for (int i = 0; i < countries.size(); i++) {
+                        for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                            if (countries.get(i).getCities().get(j).getPopulation() > population) {
                                 countries.get(i).getCities().remove(j);
                                 j--;
                             }
@@ -559,14 +776,20 @@ public class GeographicController {
                     }
                 }
 
-            }else{
-                if(m.equals("<")){
-                    for(int i=0; i<countries.size(); i++) {
-                        if(countries.get(i).getPopulation() < population){ countries.remove(i); i--;}
+            } else {
+                if (m.equals("<")) {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getPopulation() < population) {
+                            countries.remove(i);
+                            i--;
+                        }
                     }
-                }else{
-                    for(int i=0; i<countries.size(); i++) {
-                        if(countries.get(i).getPopulation() > population) {countries.remove(i); i--;}
+                } else {
+                    for (int i = 0; i < countries.size(); i++) {
+                        if (countries.get(i).getPopulation() > population) {
+                            countries.remove(i);
+                            i--;
+                        }
                     }
                 }
 
@@ -576,20 +799,30 @@ public class GeographicController {
     }
 
 
-
     public ArrayList<String> getCountries() {
-        ArrayList<String> arr= new ArrayList<>();
-        for(int i=0; i<countries.size(); i++){
+        ArrayList<String> arr = new ArrayList<>();
+        for (int i = 0; i < countries.size(); i++) {
             arr.add(countries.get(i).getName() + " " + countries.get(i).getPopulation());
         }
         return arr;
     }
 
-    public ArrayList<String> getCities(){
-        ArrayList<String> arr= new ArrayList<>();
-        for(int i=0; i<countries.size(); i++){
-            for(int j=0; j<countries.get(i).getCities().size(); j++){
+    public ArrayList<String> getCities() {
+        ArrayList<String> arr = new ArrayList<>();
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
                 arr.add(countries.get(i).getCities().get(j).getName());
+            }
+        }
+
+        return arr;
+    }
+
+    public ArrayList<String> getCitiesCountry() {
+        ArrayList<String> arr = new ArrayList<>();
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                arr.add(countries.get(i).getCities().get(j).getName() + " " + countries.get(i).getCities().get(j).getCountryId());
             }
         }
 
@@ -617,37 +850,37 @@ public class GeographicController {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     //COMPROBAMOS QUE EL ARCHIVO TENGA CONTENIDO EN LA LINEA Y QUE ESE CONTENIDO TENGA UNA INSTRUCCION VALIDA
-                        comprobateInsertComand(line);
+                    comprobateInsertComand(line);
 
-                        String [] separable= line.split("\\(");
-                        if(separable[0].equals("INSERT INTO countries")){
-                            String [] comand= line.split("VALUES");
-                            String values= comand[1];
-                            values= values.replace(" (", "");
-                            values= values.replace(")","");
-                            values= values.replace(" ","");
-                            String[] atributes= values.split(",");
-                            String id=atributes[0];
-                            String name= atributes[1];
-                            double population= Double.parseDouble(atributes[2]);
-                            String code= atributes[3];
-                            addCountry(id,name,population,code);
+                    String[] separable = line.split("\\(");
+                    if (separable[0].equals("INSERT INTO countries")) {
+                        String[] comand = line.split("VALUES");
+                        String values = comand[1];
+                        values = values.replace(" (", "");
+                        values = values.replace(")", "");
+                        values = values.replace(" ", "");
+                        String[] atributes = values.split(",");
+                        String id = atributes[0];
+                        String name = atributes[1];
+                        double population = Double.parseDouble(atributes[2]);
+                        String code = atributes[3];
+                        addCountry(id, name, population, code);
 
-                        }else{
-                            String [] comand= line.split("VALUES");
-                            String values= comand[1];
-                            values= values.replace(" (", "");
-                            values= values.replace(")","");
-                            values= values.replace(" ","");
-                            String[] atributes= values.split(",");
-                            comprobateIdCountry(atributes[2]);
-                            String id= atributes[0];
-                            String name= atributes[1];
-                            String code= atributes[2];
-                            double population= Double.parseDouble(atributes[3]);
-                            addCity(id,name,code,population);
+                    } else {
+                        String[] comand = line.split("VALUES");
+                        String values = comand[1];
+                        values = values.replace(" (", "");
+                        values = values.replace(")", "");
+                        values = values.replace(" ", "");
+                        String[] atributes = values.split(",");
+                        checkCountryId(atributes[2]);
+                        String id = atributes[0];
+                        String name = atributes[1];
+                        String code = atributes[2];
+                        double population = Double.parseDouble(atributes[3]);
+                        addCity(id, name, code, population);
 
-                        }
+                    }
 
                     serializable.add(line);
 
