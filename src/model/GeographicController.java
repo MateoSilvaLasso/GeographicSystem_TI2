@@ -154,7 +154,10 @@ public class GeographicController {
         String[] arr;
         if (option == 1) {
             arr = s.split("=");
-            if (!arr[0].equals("SELECT * FROM cities WHERE name ") && !arr[0].equals("SELECT * FROM countries WHERE name ")) {
+            if (!arr[0].equals("SELECT * FROM cities WHERE name ") && !arr[0].equals("SELECT * FROM countries WHERE name ")
+                    && !arr[0].equals("SELECT * FROM cities WHERE countryId ") && !arr[0].equals("SELECT * FROM countries WHERE countryId ")
+                    && !arr[0].equals("SELECT * FROM cities WHERE id ") && !arr[0].equals("SELECT * FROM countries WHERE id ")
+                    && !arr[0].equals("SELECT * FROM countries WHERE countryCode ") && !arr[0].equals("SELECT * FROM cities WHERE country ")) {
                 throw new InexistentCommandException(s);
             }
         } else if (option == 2) {
@@ -181,22 +184,73 @@ public class GeographicController {
             if (option == 1) {
 
                 checkSelectCommand(command, option);
-                String[] country = command.split("=");
-                if (country[0].equals("SELECT * FROM countries WHERE name ")) {
-                    String t = country[1];
+                String[] criteria = command.split("=");
+                if (criteria[0].equals("SELECT * FROM countries WHERE name ")) {
+                    String t = criteria[1];
                     t = t.replace(" ", "");
-                    if (searchCountry(t)) {
+                    if (searchCountryBool(t)) {
                         System.out.println("The country exists");
                     } else {
                         System.out.println("The country doesn't exist");
                     }
-                } else {
-                    String t = country[1];
+                } else if(criteria[0].equals("SELECT * FROM cities WHERE name ")){
+                    String t = criteria[1];
                     t = t.replace(" ", "");
-                    if (searchCity(t)) {
+                    if (searchCityBool(t)) {
                         System.out.println("The city exists");
                     } else {
                         System.out.println("The city doesn't exist");
+                    }
+                } else if(criteria[0].equals("SELECT * FROM countries WHERE countryId ")){
+
+                    String t = criteria[1];
+                    t = t.replace(" ", "");
+                    Country country = searchCountryId(t);
+                    if (country != null) {
+                        System.out.println("The country with this id is " + country.getName());
+                    } else {
+                        System.out.println("The country doesn't exist");
+                    }
+                } else if(criteria[0].equals("SELECT * FROM cities WHERE countryId ")){
+
+                    String t = criteria[1];
+                    t = t.replace(" ", "");
+                    Country country = searchCountryId(t);
+                    if (country != null) {
+                        ArrayList<City> cities = country.getCities();
+                        for(City x : cities){
+                            System.out.println(x.getName());
+                        }
+                    } else {
+                        System.out.println("This country doesn't exist");
+                    }
+                } else if(criteria[0].equals("SELECT * FROM cities WHERE id ")){
+                    String t = criteria[1];
+                    t = t.replace(" ", "");
+                    City city = searchCityId(t);
+                    if(city != null){
+                        System.out.println(city.getName());
+                    } else {
+                        System.out.println("The city doesn't exist");
+                    }
+                } else if(criteria[0].equals("SELECT * FROM countries WHERE id ")){
+
+                    String t = criteria[1];
+                    t = t.replace(" ", "");
+                    Country country = searchCountryId(t);
+                    if(country != null){
+                        System.out.println(country.getName());
+                    } else {
+                        System.out.println("The country doesn't exist");
+                    }
+                } else {
+                    String t = criteria[1];
+                    t = t.replace(" ", "");
+                    Country country = searchCountryCode(t);
+                    if(country != null){
+                        System.out.println(country.getName());
+                    } else {
+                        System.out.println("The country doesn't exist");
                     }
                 }
 
@@ -258,7 +312,7 @@ public class GeographicController {
                         }
                     }
                 }
-            } else {
+            } else if (option == 4){
 
                 checkSelectCommand(command, option);
                 String[] Population = command.split("WHERE");
@@ -317,7 +371,7 @@ public class GeographicController {
         }
     }
 
-    public void addCity(String id, String name, String countryCode, double population) throws IncorrectFormatExcepcion {
+    public void addCity(String id, String name, String countryCode, double population) throws IncorrectFormatException {
 
         City city = new City(id, name, countryCode, population);
         Country c = searchCountryId(countryCode);
@@ -335,7 +389,7 @@ public class GeographicController {
 
     }
 
-    public boolean searchCountry(String s) {
+    public boolean searchCountryBool(String s) {
         boolean flag = false;
 
         for (int i = 0; i < countries.size(); i++) {
@@ -357,9 +411,19 @@ public class GeographicController {
         return null;
     }
 
-    public boolean searchCity(String s) {
-        boolean flag = false;
+    public Country searchCountryCode(String s) {
 
+        for (int i = 0; i < countries.size(); i++) {
+            if (countries.get(i).getCountryCode().equals(s)) {
+                return countries.get(i);
+            }
+        }
+        return null;
+    }
+
+    public boolean searchCityBool(String s) {
+
+        boolean flag = false;
         for (int i = 0; i < countries.size(); i++) {
             for (int j = 0; j < countries.get(i).getCities().size(); j++) {
                 if (countries.get(i).getCities().get(j).getName().equals(s)) {
@@ -369,6 +433,19 @@ public class GeographicController {
         }
 
         return flag;
+    }
+
+    public City searchCityId(String s) {
+
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).getCities().size(); j++) {
+                if (countries.get(i).getCities().get(j).getId().equals(s)) {
+                    return countries.get(i).getCities().get(j);
+                }
+            }
+        }
+
+        return null;
     }
 
     public ArrayList<String> searchBigPopulation(double p) {
@@ -629,12 +706,8 @@ public class GeographicController {
                     String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
                     all.add(target);
                 }
-
             }
-
         }
-
-
         return all;
     }
 
@@ -664,7 +737,6 @@ public class GeographicController {
 
     public void deletePlace(int option, String place, String attribute, String value, double population, String m) throws NoAttributeException {
         if (option == 1) {
-
 
             if (place.contains("cities")) {
                 if ((!attribute.equalsIgnoreCase("name") && !attribute.equalsIgnoreCase("id") && !attribute.equalsIgnoreCase("CountryId") && !attribute.equalsIgnoreCase("population"))) {
@@ -792,8 +864,6 @@ public class GeographicController {
                         }
                     }
                 }
-
-
             }
         }
     }
@@ -802,7 +872,7 @@ public class GeographicController {
     public ArrayList<String> getCountries() {
         ArrayList<String> arr = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
-            arr.add(countries.get(i).getName() + " " + countries.get(i).getPopulation());
+            arr.add(countries.get(i).getName());
         }
         return arr;
     }
@@ -892,6 +962,7 @@ public class GeographicController {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.out.println("Files were loaded");
         } else {
             //SI NO EXISTE, DECIMOS QUE NO EXISTE JAJA ._.
             System.out.println("This file doesn't exist.");

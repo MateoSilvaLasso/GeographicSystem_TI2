@@ -53,7 +53,7 @@ public class GeographicMain {
                         }
                     } else if (command.contains("SELECT * FROM") && !command.contains("ORDER")) {
 
-                        if (command.contains("name")) {
+                        if (command.contains("=")) {
                             map.selectFrom(1, command);
                         } else if (command.contains(">")) {
                             map.selectFrom(2, command);

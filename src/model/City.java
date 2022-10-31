@@ -1,6 +1,6 @@
 package model;
 
-import exception.IncorrectFormatExcepcion;
+import exception.IncorrectFormatException;
 
 public class City implements Comparable<City> {
     private String id;
@@ -8,18 +8,18 @@ public class City implements Comparable<City> {
     private String countryId;
     private double population;
 
-    public City(String id, String name, String countryId, double population) throws IncorrectFormatExcepcion{
+    public City(String id, String name, String countryId, double population) throws IncorrectFormatException{
         if(id.charAt(0)!= 39 && id.charAt(id.length()-1)!=39)
-            throw new IncorrectFormatExcepcion(id);
+            throw new IncorrectFormatException(id);
         else
             this.id = id;
 
         if(name.charAt(0)!=39 && name.charAt(name.length()-1)!=39)
-            throw new IncorrectFormatExcepcion(name);
+            throw new IncorrectFormatException(name);
         else
             this.name = name;
         if(countryId.charAt(0)!=39 && countryId.charAt(countryId.length()-1)!=39)
-            throw new IncorrectFormatExcepcion(countryId);
+            throw new IncorrectFormatException(countryId);
         else
             this.countryId = countryId;
 

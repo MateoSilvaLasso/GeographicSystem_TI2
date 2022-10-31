@@ -48,11 +48,11 @@ class GeographicControllerTest {
         //we are checking here if something was added to the country arraylist
         assertFalse(controller.getCountries().isEmpty());
         //we are checking here if Colombia was added
-        assertEquals("'Colombia' 50.2", controller.getCountries().get(0));
+        assertEquals("'Colombia'", controller.getCountries().get(0));
         //we are checking here if Mexico was added
-        assertEquals("'Mexico' 27.0", controller.getCountries().get(1));
+        assertEquals("'Mexico'", controller.getCountries().get(1));
         //we are checking here if Venezuela was added
-        assertEquals("'Venezuela' 34.6", controller.getCountries().get(2));
+        assertEquals("'Venezuela'", controller.getCountries().get(2));
     }
 
     @Test
@@ -86,9 +86,9 @@ class GeographicControllerTest {
             System.out.println(e.toString());
         }
         //we are checking here if Colombia wasn't updated
-        assertTrue(controller.searchCountry("'Colombia'"));
+        assertTrue(controller.searchCountryBool("'Colombia'"));
         //we are checking here if mexico wasn't added
-        assertFalse(controller.searchCountry("'Mexico'"));
+        assertFalse(controller.searchCountryBool("'Mexico'"));
 
     }
 
@@ -103,12 +103,13 @@ class GeographicControllerTest {
             System.out.println(e.toString());
         }
         //we are checking here if the city wasn't added
-        assertFalse(controller.searchCity("'Cali'"));
+        assertFalse(controller.searchCityBool("'Cali'"));
     }
 
     @Test
     public void selectCountryCitiesTest(){
         setup3();
+        controller.selectFrom(1, "SELECT * FROM cities WHERE countryId = '01'");
     }
 
     @Test
