@@ -115,12 +115,28 @@ class GeographicControllerTest {
 
     @Test
     public void nameOrderTest(){
-        setup3();
-        controller.selectFrom(1, "SELECT * FROM cities WHERE countryId = '01' ORDER BY name");
+        setup2();
+        controller.orderSelection(2, "SELECT * FROM cities WHERE countryId = '01' ORDER BY name",
+                0, "'01'", "name");
     }
 
     @Test
     public void countriesWithPopulationGreaterThan100Test(){
         setup4();
+        controller.selectFrom(1, "SELECT * FROM countries WHERE population > 100");
+    }
+
+    @Test
+    public void deleteFromId(){
+        setup2();
+        controller.delete(1, "DELETE FROM countries WHERE name = 'Colombia'");
+        assertFalse(controller.searchCountryBool("'Colombia'"));
+    }
+
+    @Test
+    public void deleteCitiesOfCountry(){
+        setup2();
+        controller.delete(2,"DELETE * FROM cities WHERE countryId = '01'");
+        assertFalse(controller.searchCityBool("'Cali"));
     }
 }
