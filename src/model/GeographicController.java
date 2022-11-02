@@ -351,7 +351,7 @@ public class GeographicController {
 
         } else {
             arr = s.split(" ");
-            if ((!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY"))) {
+            if ((!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("cities") || !arr[4].equals("WHERE")  || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY")) && (!arr[0].equals("SELECT") || !arr[1].equals("*") || !arr[2].equals("FROM") || !arr[3].equals("countries") || !arr[4].equals("WHERE") || !arr[5].equals("name") || !arr[6].equals("=") || !arr[8].equals("ORDER") || !arr[9].equals("BY"))) {
                 throw new InexistentCommandException(s);
             }
         }
@@ -653,7 +653,9 @@ public class GeographicController {
             if (check[3].equals("cities")) {
                 for (int i = 0; i < countries.size(); i++) {
                     for (int j = 0; j < countries.get(i).getCities().size(); j++) {
-                        if (countries.get(i).getCities().get(j).getName().equals(name)) {
+                        if (countries.get(i).getCities().get(j).getName().equals(name) ||
+                        countries.get(i).getCities().get(j).getId().equals(name)||
+                                countries.get(i).getCities().get(j).getCountryId().equals(name)) {
                             arr.add(countries.get(i).getCities().get(j));
                         }
                     }
