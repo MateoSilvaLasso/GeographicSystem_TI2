@@ -92,7 +92,8 @@ public class GeographicMain {
 
                 break;
 
-            case 3:
+            case 0:
+                map.autoSave();
                 System.out.println("BYE");
                 break;
             default:

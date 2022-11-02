@@ -30,7 +30,7 @@ public class GeographicController {
 
     public void addSerializableCountry(String s) {
         this.serializable.add(s);
-        autoSave();
+        //autoSave();
     }
 
     public void comprobateInsertComand(String s) throws InexistentCommandException {
@@ -126,11 +126,11 @@ public class GeographicController {
 
     public void checkAttribute(String s, int option) throws NoAttributeException {
         if (option == 1) {
-            if (!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryCode")) {
+            if (!s.equalsIgnoreCase("id") && !s.equalsIgnoreCase("name") && !s.equalsIgnoreCase("population") && !s.equalsIgnoreCase("countryCode")) {
                 throw new NoAttributeException(s);
             }
         } else {
-            if (!s.equals("id") && !s.equals("name") && !s.equals("population") && !s.equals("countryId")) {
+            if (!s.equalsIgnoreCase("id") && !s.equalsIgnoreCase("name") && !s.equalsIgnoreCase("population") && !s.equalsIgnoreCase("countryId")) {
                 throw new NoAttributeException(s);
             }
         }
@@ -502,7 +502,12 @@ public class GeographicController {
             if (option == 1) {
                 checkOrderByCommand(command, option);
                 String[] attribute = command.split("BY ");
-                checkAttribute(attribute[1], option);
+                if(command.contains("countries")){
+                    checkAttribute(attribute[1], 1);
+                }else{
+                    checkAttribute(attribute[1], 2);
+                }
+
                 String[] criteria = command.split(" ");
                 double cr = Double.parseDouble(criteria[7]);
                 ArrayList<String> arr = orderSelection(option, command, cr, "", attribute[1]);
@@ -515,7 +520,12 @@ public class GeographicController {
 
                 checkOrderByCommand(command, option);
                 String[] attribute = command.split("BY ");
-                checkAttribute(attribute[1], option);
+                if(command.contains("countries")){
+                    checkAttribute(attribute[1], 1);
+                }else{
+                    checkAttribute(attribute[1], 2);
+                }
+
                 String[] criteria = command.split(" ");
                 String name = criteria[7];
                 ArrayList<String> arr = orderSelection(option, command, 0, name, attribute[1]);
@@ -872,7 +882,7 @@ public class GeographicController {
     public ArrayList<String> getCountries() {
         ArrayList<String> arr = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
-            arr.add(countries.get(i).getName());
+            arr.add(countries.get(i).getName()+" "+countries.get(i).getId()+" "+countries.get(i).getCountryCode()+" "+countries.get(i).getPopulation());
         }
         return arr;
     }
@@ -881,7 +891,7 @@ public class GeographicController {
         ArrayList<String> arr = new ArrayList<>();
         for (int i = 0; i < countries.size(); i++) {
             for (int j = 0; j < countries.get(i).getCities().size(); j++) {
-                arr.add(countries.get(i).getCities().get(j).getName());
+                arr.add(countries.get(i).getCities().get(j).getName()+" "+countries.get(i).getCities().get(j).getId()+" "+countries.get(i).getCities().get(j).getCountryId()+" "+countries.get(i).getCities().get(j).getPopulation());
             }
         }
 
@@ -918,13 +928,23 @@ public class GeographicController {
                 );
 
                 String line;
+                String json="";
                 while ((line = reader.readLine()) != null) {
-                    //COMPROBAMOS QUE EL ARCHIVO TENGA CONTENIDO EN LA LINEA Y QUE ESE CONTENIDO TENGA UNA INSTRUCCION VALIDA
-                    comprobateInsertComand(line);
+                    json+=line;
+                }
 
-                    String[] separable = line.split("\\(");
+                fis.close();
+
+                Gson gson1=new Gson();
+
+                String[] arr= gson1.fromJson(json,String[].class);
+
+                for(int i=0; i<arr.length; i++){
+                    comprobateInsertComand(arr[i]);
+
+                    String[] separable = arr[i].split("\\(");
                     if (separable[0].equals("INSERT INTO countries")) {
-                        String[] comand = line.split("VALUES");
+                        String[] comand = arr[i].split("VALUES");
                         String values = comand[1];
                         values = values.replace(" (", "");
                         values = values.replace(")", "");
@@ -937,7 +957,7 @@ public class GeographicController {
                         addCountry(id, name, population, code);
 
                     } else {
-                        String[] comand = line.split("VALUES");
+                        String[] comand = arr[i].split("VALUES");
                         String values = comand[1];
                         values = values.replace(" (", "");
                         values = values.replace(")", "");
@@ -952,11 +972,9 @@ public class GeographicController {
 
                     }
 
-                    serializable.add(line);
-
-
+                    serializable.add(arr[i]);
                 }
-                fis.close();
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
