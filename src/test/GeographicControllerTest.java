@@ -110,11 +110,13 @@ class GeographicControllerTest {
     public void selectCountryCitiesTest(){
         setup3();
         controller.selectFrom(1, "SELECT * FROM cities WHERE countryId = '01'");
+        //We expect that the cities that will be printed are Cali, Bogota, Pasto and Medellin
     }
 
     @Test
     public void nameOrderTest(){
         setup3();
+        controller.selectFrom(1, "SELECT * FROM cities WHERE countryId = '01' ORDER BY name");
     }
 
     @Test

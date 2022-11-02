@@ -589,7 +589,8 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < arr.size(); i++) {
-                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getPopulation() + ", " + arr.get(i).getCountryCode();
+                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", "
+                            + arr.get(i).getPopulation() + ", " + arr.get(i).getCountryCode();
                     all.add(target);
                 }
             } else {
@@ -637,7 +638,8 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < ar.size(); i++) {
-                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getPopulation() + ", " + ar.get(i).getCountryId();
+                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getPopulation()
+                            + ", " + ar.get(i).getCountryId();
                     all.add(target);
                 }
 
@@ -680,7 +682,8 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < arr.size(); i++) {
-                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", " + arr.get(i).getCountryId() + ", " + arr.get(i).getPopulation();
+                    String target = arr.get(i).getId() + ", " + arr.get(i).getName() + ", "
+                            + arr.get(i).getCountryId() + ", " + arr.get(i).getPopulation();
                     all.add(target);
                 }
             } else {
@@ -713,7 +716,8 @@ public class GeographicController {
                 }
 
                 for (int i = 0; i < ar.size(); i++) {
-                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", " + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
+                    String target = ar.get(i).getId() + ", " + ar.get(i).getName() + ", "
+                            + ar.get(i).getCountryCode() + ", " + ar.get(i).getPopulation();
                     all.add(target);
                 }
             }
